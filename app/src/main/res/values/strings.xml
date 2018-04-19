@@ -1,0 +1,26 @@
+<resources>
+    <!-- String com dados de configuração -->
+    <string name="cfg_app_path_url_popular_movies">http://api.themoviedb.org/3/movie/popular</string>
+    <string name="cfg_app_path_url_top_rated_movies">http://api.themoviedb.org/3/movie/top_rated</string>
+    <string name="cfg_app_api_key">api_key</string>
+    <string name="cfg_app_api_key_value">INSERIR CHAVE DE API AQUI</string>
+    <!-- Fim da área de configuração -->
+    <!-- String titulo de comandos -->
+    <string name="menu_label_popular_movies">Buscar Mais Populares</string>
+    <string name="menu_label_popular_top_rated">Buscar Melhores Avaliados</string>
+    <!-- Fim da área de configuração de Strings de comandos -->
+    <!-- String titulo de recursos para transporte de intents -->
+    <string name="name_movie_trans_activity">movieObject</string>
+    <!-- Fim da área de configuração -->
+    <string name="title_msg_erro">Erro</string>
+    <string name="title_activity_main_default">Filmes Mais Populares</string>
+    <string name="title_activity_main_top_rated">Filmes Melhores Avaliados</string>
+    <string name="title_activity_detail">Detalhes</string>
+    <string name="title_detail_sinopse">Sinopse</string>
+    <string name="title_vote_average">Avaliação dos Usuários</string>
+    <string name="title_release_date">Data de Lançamento</string>
+    <string name="app_name">Filmes Famosos</string>
+    <string name="app_erro_network_acess">Seu dispositivo não está conectado a WEB. Este Aplicativo consome recursos da WEB. Conecte e tente novamente</string>
+    <string name="app_erro_network_acess_detail">Seu dispositivo não está conectado a WEB. Esta tela, carrega imagens de um servidor remoto. Portanto é necessário que exista uma conexão para que todos os dados sejam exibidos.</string>
+    <string name="app_json_not_exists">Ocorreu um problema na obtenção dos dados referentes aos filmes. Seu dispositivo pode estar desconectado da internet, ou esta ocorrendo instabilidade no servidor de dados. Verifique a conexão ou tente mais tarde.</string>
+</resources>
