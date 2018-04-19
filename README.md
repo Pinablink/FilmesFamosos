@@ -9,14 +9,18 @@ Para o funcionamento do aplicativo, é necessário informar uma **api_key** do s
 **Localize a tag cfg_app_api_key_value, para informação da api_key:**
 <br/>
 **Em seguida substitua o valor INSERIR SUA CHAVE DE API AQUI, que é o valor da tag pela api_key**
+<br/>
+<br/>
+![stringRes](imgREADME/stringRes.jpg)
 
 ### Funcionamento do Aplicativo
 
-Ao iniciar o Aplicativo, a primeira Activity disponibiliza por padrão, a lista de Filmes mais populares do serviço The Movie DB. Está disponível para o usuário um menu composto de dois itens. Esses itens são respectivamente, Buscar Mais Populares e Buscar Melhores Avaliados. 
+Ao iniciar o Aplicativo, a primeira Activity disponibiliza por padrão, a lista de Filmes mais populares do serviço The Movie DB. Está disponível para o usuário um menu composto de dois itens. Esses itens são respectivamente, **Buscar Mais Populares** e **Buscar Melhores Avaliados**.<br/>
+![Menu](imgREADME/Menu.jpg)
 
 ### Sobre a primeira Activity
 
-A primeira Activity, é a principal do Aplicativo. Sua configuração está como GridLayout de 2 colunas e os filmes são exibidos em cartazes.
+A primeira Activity, é a principal do Aplicativo. Sua configuração está como GridLayout de 2 colunas e os filmes são exibidos em cartazes. **Verifique a imagem anterior**.
 
 ### Sobre o item de menu - Buscar Mais Populares
 
@@ -37,4 +41,5 @@ Os seguintes itens são exibidos na tela de Detalhes<br/>
 * Titulo
 * Sinopse
 * Pontuação de Ranking
-* Data de Lançamento
+* Data de Lançamento <br/><br/>
+![DetalheFilme](imgREADME/DetalheFilme.jpg)
