@@ -24,66 +24,33 @@ import br.com.nanodegree.pinablink.exception.PMJSonErrorReader;
  */
 public class PopularMoviesParserData {
 
-    /**
-     *
-     */
+
     private String contentJson;
 
-    /**
-     *
-     */
-    private AppCompatActivity activityRefer;
 
-    /**
-     *
-     */
-    private String pmJsonMsgException;
-
-    /**
-     *
-     */
-    private Class referObjectReturn;
-
-    /**
-     * @param pActivityRefer
-     */
-    public PopularMoviesParserData(AppCompatActivity pActivityRefer) {
+    public PopularMoviesParserData() {
         super();
-        this.activityRefer = pActivityRefer;
-        this.loadResource();
     }
 
-    /**
-     *
-     */
-    private void loadResource() {
-        this.pmJsonMsgException = this.activityRefer.getString(R.string.app_json_not_exists);
-    }
 
-    /**
-     * @param pContentJson
-     * @return
-     * @throws PMJSonErrorReader
-     */
-    public PopularMovies process(String pContentJson)
-            throws PMJSonErrorReader {
+    public PopularMovies process(String pContentJson) {
 
-        PopularMovies popularMoviesObject =  null;
+        PopularMovies popularMoviesObject;
 
-        if (pContentJson != null && !pContentJson.isEmpty()) {
-            this.contentJson = pContentJson;
-            popularMoviesObject = this.run();
-        } else {
-            throw new PMJSonErrorReader(this.pmJsonMsgException);
+        try{
+            if (pContentJson != null && !pContentJson.isEmpty()) {
+                this.contentJson = pContentJson;
+                popularMoviesObject = this.run();
+            } else {
+                popularMoviesObject = null;
+            }
+        }  catch (PMJSonErrorReader e) {
+            popularMoviesObject = null;
         }
 
         return popularMoviesObject;
     }
 
-    /**
-     * @return
-     * @throws PMJSonErrorReader
-     */
     private PopularMovies run()
             throws PMJSonErrorReader {
 
@@ -99,27 +66,16 @@ public class PopularMoviesParserData {
                 popularReturn = this.createObjPopularMovies(jsonObject);
 
             } catch (JSONException e) {
-                throw new PMJSonErrorReader(this.pmJsonMsgException, e);
+                throw new PMJSonErrorReader();
             }
 
         } else {
-            throw new PMJSonErrorReader(this.pmJsonMsgException);
+            throw new PMJSonErrorReader();
         }
 
         return popularReturn;
     }
 
-    /**
-     *
-     * @param pConcatLeft
-     * @param pConcatRight
-     * @param pName
-     * @param pValueType
-     * @param pMethod
-     * @param pMovie
-     * @param pReferMovie
-     * @throws Exception
-     */
     private void setValueTp(String pConcatLeft,
                             String pConcatRight,
                             String pName,
@@ -152,17 +108,6 @@ public class PopularMoviesParserData {
         }
     }
 
-    /**
-     *
-     * @param pConcatLeft
-     * @param pConcatRight
-     * @param pName
-     * @param pValueType
-     * @param pMethod
-     * @param pPopularMovies
-     * @param pReferMovie
-     * @throws Exception
-     */
     private void setValueTp(String pConcatLeft,
                             String pConcatRight,
                             String pName,
@@ -195,30 +140,22 @@ public class PopularMoviesParserData {
         }
     }
 
-    /**
-     * @param pReferMovie
-     * @return
-     * @throws Exception
-     */
     private Movie createMovie(JSONObject pReferMovie)
             throws Exception {
         Movie movieReturn = new Movie();
         Method[] methods = movieReturn.getClass().getMethods();
-        String pStringName = null;
-        String sLeft    = "";
-        String sRight   = "";
         int pValueParamType = Param.VALUE_TYPE_STRING; //Valor default de inicialização
-        ParamInJson paramInJsonRefer;
+
 
         for (Method method : methods) {
             boolean paramAnnotationPresent = method.isAnnotationPresent(ParamInJson.class);
 
             if (paramAnnotationPresent) {
-                paramInJsonRefer = method.getAnnotation(ParamInJson.class);
-                pStringName = paramInJsonRefer.name();
+                ParamInJson paramInJsonRefer = method.getAnnotation(ParamInJson.class);
+                String pStringName  = paramInJsonRefer.name();
                 pValueParamType = paramInJsonRefer.valueType();
-                sLeft   =   paramInJsonRefer.concatLeft();
-                sRight  =   paramInJsonRefer.concatRight();
+                String sLeft   =   paramInJsonRefer.concatLeft();
+                String sRight  =   paramInJsonRefer.concatRight();
                 this.setValueTp(sLeft, sRight, pStringName, pValueParamType, method, movieReturn, pReferMovie);
             }
         }
@@ -226,14 +163,6 @@ public class PopularMoviesParserData {
         return movieReturn;
     }
 
-    /**
-     * @param idParam
-     * @param pPopularMovies
-     * @param pJsonObject
-     * @param pListMovie
-     * @param method
-     * @throws PMJSonErrorReader
-     */
     private void inputMovies(String idParam,
                              PopularMovies pPopularMovies,
                              JSONObject pJsonObject,
@@ -255,16 +184,10 @@ public class PopularMoviesParserData {
             }
 
         } catch (Exception ex) {
-            throw new PMJSonErrorReader(this.pmJsonMsgException);
+            throw new PMJSonErrorReader();
         }
     }
 
-    /**
-     * @param pJsonObject
-     * @return
-     * @throws JSONException
-     * @throws PMJSonErrorReader
-     */
     private PopularMovies createObjPopularMovies(JSONObject pJsonObject)
             throws JSONException, PMJSonErrorReader {
         PopularMovies popularMovies = new PopularMovies();
@@ -275,24 +198,13 @@ public class PopularMoviesParserData {
         return popularMovies;
     }
 
-    /**
-     * @param methods
-     * @param refer
-     * @param pJsonObject
-     * @throws PMJSonErrorReader
-     */
     private void inputData(Method[] methods,
                            PopularMovies refer,
                            JSONObject pJsonObject)
             throws PMJSonErrorReader {
 
-        ParamInJson paramInJson = null;
         boolean isArrayData = false;
-        String paramSearchInJson = null;
-        String strLeft = "";
-        String strRight = "";
         int valueType = Param.VALUE_TYPE_STRING; // Valor padrão de inicialização
-        String value = null;
         final List<Movie> listMovie = new ArrayList<Movie>();
 
         for (Method method : methods) {
@@ -300,12 +212,12 @@ public class PopularMoviesParserData {
             boolean annotationParamPresent = method.isAnnotationPresent(ParamInJson.class);
 
             if (annotationParamPresent) {
-                paramInJson = method.getAnnotation(ParamInJson.class);
-                paramSearchInJson = paramInJson.name();
+                ParamInJson paramInJson = method.getAnnotation(ParamInJson.class);
+                String paramSearchInJson = paramInJson.name();
                 valueType = paramInJson.valueType();
                 isArrayData = paramInJson.isArrayData();
-                strLeft = paramInJson.concatLeft();
-                strRight = paramInJson.concatRight();
+                String strLeft  = paramInJson.concatLeft();
+                String strRight = paramInJson.concatRight();
 
                 try {
 
@@ -316,7 +228,7 @@ public class PopularMoviesParserData {
                     }
 
                 } catch (Exception e) {
-                    throw new PMJSonErrorReader(this.pmJsonMsgException, e);
+                    throw new PMJSonErrorReader();
                 }
             }
         }

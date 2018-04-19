@@ -3,14 +3,25 @@ package br.com.nanodegree.pinablink;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ProgressBar;
 
-import java.net.URL;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
 
+import java.net.URL;
+import java.util.Iterator;
+import java.util.List;
+
+import br.com.nanodegree.pinablink.dataObject.Movie;
+import br.com.nanodegree.pinablink.dataObject.PopularMovies;
+import br.com.nanodegree.pinablink.engine.adapter.PopularMoviesPosterAdapter;
 import br.com.nanodegree.pinablink.engine.network.PopularMoviesNetworkRun;
+import br.com.nanodegree.pinablink.engine.network.task.AsyncTaskNetworkDelegator;
 import br.com.nanodegree.pinablink.engine.parser.PopularMoviesParserData;
 import br.com.nanodegree.pinablink.engine.network.PopularMoviesNetworkConfig;
 import br.com.nanodegree.pinablink.engine.network.task.PopularMoviesNetworkTask;
@@ -18,45 +29,21 @@ import br.com.nanodegree.pinablink.engine.util.PopularMoviesCertAcessNetwork;
 import br.com.nanodegree.pinablink.engine.util.PopularMoviesMsg;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity
+        extends AppCompatActivity implements AsyncTaskNetworkDelegator {
 
-    /**
-     *
-     */
     private PopularMoviesParserData parserData;
-
-    /**
-     *
-     */
     private PopularMoviesNetworkConfig networkConfig;
-
-    /**
-     *
-     */
     private PopularMoviesNetworkRun networkRun;
-
-    /**
-     *
-     */
     private RecyclerView recycleViewPosterPresentation;
-
-    /**
-     *
-     */
     private ProgressBar progressProcess;
 
-    /**
-     * Inicializa todos os recursos que a Activity vai necessitar para realização de suas tarefas
-     */
     private void initResource() {
-        this.parserData = new PopularMoviesParserData(MainActivity.this);
+        this.parserData = new PopularMoviesParserData();
         this.networkConfig = new PopularMoviesNetworkConfig(MainActivity.this);
         this.networkRun = new PopularMoviesNetworkRun();
     }
 
-    /**
-     *
-     */
     private void initResourceScreen() {
         this.recycleViewPosterPresentation = (RecyclerView) findViewById(R.id.recyclerview_presentation_movies);
         this.progressProcess = (ProgressBar) findViewById(R.id.mProgress);
@@ -75,10 +62,8 @@ public class MainActivity extends AppCompatActivity {
             URL urlPopularMovies = this.networkConfig.getURLPopularMovies();
 
             new PopularMoviesNetworkTask(MainActivity.this,
-                    this.progressProcess,
                     this.parserData,
-                    this.networkRun,
-                    this.recycleViewPosterPresentation).execute(urlPopularMovies);
+                    this.networkRun).execute(urlPopularMovies);
 
             setTitle(R.string.title_activity_main_default);
         } else {
@@ -88,20 +73,12 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    /**
-     * @param menu
-     * @return
-     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_popular_movies_app, menu);
         return true;
     }
 
-    /**
-     * @param item
-     * @return
-     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -112,19 +89,15 @@ public class MainActivity extends AppCompatActivity {
             if (itemSelected == R.id.menu_item_popularMovies) {
                 URL urlPopularMovies = this.networkConfig.getURLPopularMovies();
                 new PopularMoviesNetworkTask(MainActivity.this,
-                        this.progressProcess,
                         this.parserData,
-                        this.networkRun,
-                        this.recycleViewPosterPresentation).execute(urlPopularMovies);
+                        this.networkRun).execute(urlPopularMovies);
                 this.setTitle(R.string.title_activity_main_default);
                 return true;
             } else if (itemSelected == R.id.menu_item_topRated) {
                 URL urlTopRated = this.networkConfig.getURLTopRatedMovies();
                 new PopularMoviesNetworkTask(MainActivity.this,
-                        this.progressProcess,
                         this.parserData,
-                        this.networkRun,
-                        this.recycleViewPosterPresentation).execute(urlTopRated);
+                        this.networkRun).execute(urlTopRated);
                 this.setTitle(R.string.title_activity_main_top_rated);
                 return true;
             }
@@ -135,5 +108,40 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onPostFinished(PopularMovies popularMovies) {
+        this.progressProcess.setVisibility(View.INVISIBLE);
+
+        if (popularMovies == null) {
+            String msgErroJsonParser = this.getString(R.string.app_json_not_exists);
+            new PopularMoviesMsg().showMessageErro(msgErroJsonParser, MainActivity.this);
+        } else {
+            this.recycleViewPosterPresentation.setVisibility(View.VISIBLE);
+            List<Movie> refListMovies = popularMovies.getListMovie();
+            PopularMoviesPosterAdapter popularMoviesPosterAdapter = new PopularMoviesPosterAdapter(refListMovies);
+            GridLayoutManager layoutManager = new GridLayoutManager(MainActivity.this, 2);
+            this.recycleViewPosterPresentation.setLayoutManager(layoutManager);
+            this.recycleViewPosterPresentation.setAdapter(popularMoviesPosterAdapter);
+        }
+    }
+
+    @Override
+    public void onSearchImages(PopularMovies pPopularMovies) {
+        List<Movie> listMovie = pPopularMovies.getListMovie();
+        Iterator<Movie> iterMovie = listMovie.iterator();
+
+        while (iterMovie.hasNext()) {
+            Movie refMovieLine = iterMovie.next();
+            String strPosterPath = refMovieLine.getPosterPath();
+            RequestCreator requestCreatorRefLine0 = Picasso.with(MainActivity.this).load(strPosterPath);
+            refMovieLine.setRefRequesImg(requestCreatorRefLine0);
+        }
+    }
+
+    @Override
+    public void onInitProgressBar() {
+        this.progressProcess.setVisibility(View.VISIBLE);
     }
 }
