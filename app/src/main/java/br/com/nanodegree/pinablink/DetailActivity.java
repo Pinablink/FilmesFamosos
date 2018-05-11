@@ -1,6 +1,7 @@
 package br.com.nanodegree.pinablink;
 
 import android.content.Intent;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -20,34 +21,12 @@ import br.com.nanodegree.pinablink.engine.util.PopularMoviesMsg;
  */
 public class DetailActivity extends AppCompatActivity {
 
-    /**
-     *
-     */
     private Movie refMovie;
-
-    /**
-     *
-     */
     private TextView textTitle;
-
-    /**
-     *
-     */
     private TextView textSinopse;
-
-    /**
-     *
-     */
     private TextView textVoteAverage;
-
-    /**
-     *
-     */
     private TextView textReleaseDate;
 
-    /**
-     *
-     */
     private void initResourceScreen() {
         this.textTitle = (TextView) findViewById(R.id.mTitle);
         this.textSinopse = (TextView) findViewById(R.id.mSinopse);
@@ -55,9 +34,6 @@ public class DetailActivity extends AppCompatActivity {
         this.textReleaseDate = (TextView) findViewById(R.id.mReleaseDate);
     }
 
-    /**
-     * @return
-     */
     private void loadMovie() {
         boolean isNetworkOk = PopularMoviesCertAcessNetwork.isNetworkAcessOK(this.getApplicationContext());
         String keyStringExtra = getString(R.string.name_movie_trans_activity);
@@ -94,6 +70,12 @@ public class DetailActivity extends AppCompatActivity {
         this.textReleaseDate.setText(releaseDate);
     }
 
+    private void actionBarEnabledDisplayHome (ActionBar actionBar) {
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
     /**
      * @param savedInstanceState
      */
@@ -102,10 +84,11 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
         setTitle(R.string.title_activity_detail);
+        ActionBar actionBar = getSupportActionBar();
         this.initResourceScreen();
         this.loadMovie();
         this.createScreen();
-
+        this.actionBarEnabledDisplayHome(actionBar);
     }
 
 
