@@ -18,9 +18,9 @@ public class PopularMoviesNetworkTask
 
     private PopularMoviesParserData parserData;
     private PopularMoviesNetworkRun networkRun;
-    private MainActivity activityRefer;
+    private AsyncTaskNetworkDelegator activityRefer;
 
-    public PopularMoviesNetworkTask(MainActivity pMainActivity,
+    public PopularMoviesNetworkTask(AsyncTaskNetworkDelegator pMainActivity,
                                     PopularMoviesParserData pFormatData,
                                     PopularMoviesNetworkRun pNetworkRun) {
 

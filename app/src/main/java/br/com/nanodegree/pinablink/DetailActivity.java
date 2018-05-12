@@ -12,14 +12,22 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 
+import java.util.List;
+
+import br.com.nanodegree.pinablink.dataObject.DetailVideoReviewMovie;
 import br.com.nanodegree.pinablink.dataObject.Movie;
+import br.com.nanodegree.pinablink.dataObject.PopularMovies;
+import br.com.nanodegree.pinablink.dataObject.Review;
+import br.com.nanodegree.pinablink.engine.network.task.ActivityTask;
+import br.com.nanodegree.pinablink.engine.network.task.VideoMovieReviewNetworkTask;
 import br.com.nanodegree.pinablink.engine.util.PopularMoviesCertAcessNetwork;
 import br.com.nanodegree.pinablink.engine.util.PopularMoviesMsg;
 
 /**
  *
  */
-public class DetailActivity extends AppCompatActivity {
+public class DetailActivity
+        extends ActivityTask {
 
     private Movie refMovie;
     private TextView textTitle;
@@ -27,7 +35,7 @@ public class DetailActivity extends AppCompatActivity {
     private TextView textVoteAverage;
     private TextView textReleaseDate;
 
-    private void initResourceScreen() {
+    protected void initResourceScreen() {
         this.textTitle = (TextView) findViewById(R.id.mTitle);
         this.textSinopse = (TextView) findViewById(R.id.mSinopse);
         this.textVoteAverage = (TextView) findViewById(R.id.mVoteAverage);
@@ -35,19 +43,25 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void loadMovie() {
-        boolean isNetworkOk = PopularMoviesCertAcessNetwork.isNetworkAcessOK(this.getApplicationContext());
+
         String keyStringExtra = getString(R.string.name_movie_trans_activity);
         Intent intentOrigin = getIntent();
-        this.refMovie = intentOrigin.getExtras().getParcelable(keyStringExtra);
-        String strBackDropImage = this.refMovie.getBackdropPath();
-        RequestCreator refRequestImg = Picasso.with(this.getApplicationContext()).load(strBackDropImage);
-        this.refMovie.setRefRequesImg(refRequestImg);
-
+        this.refMovie  = intentOrigin.getExtras().getParcelable(keyStringExtra);
+        boolean isNetworkOk = PopularMoviesCertAcessNetwork.isNetworkAcessOK(this.getApplicationContext());
 
         if (!isNetworkOk) {
             String msgErro = this.getString(R.string.app_erro_network_acess_detail);
             new PopularMoviesMsg().showMessageErro(msgErro, DetailActivity.this);
+        } else {
+            new VideoMovieReviewNetworkTask(this.networkConfig,
+                    this.parserData, this.networkRun, this).execute(new Movie[]{this.refMovie});
         }
+        /*String idMovie = this.refMovie.getId();
+
+        String strBackDropImage = this.refMovie.getBackdropPath();
+        RequestCreator refRequestImg = Picasso.with(this.getApplicationContext()).load(strBackDropImage);
+
+        this.refMovie.setRefRequesImg(refRequestImg);*/
 
     }
 
@@ -85,11 +99,31 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
         setTitle(R.string.title_activity_detail);
         ActionBar actionBar = getSupportActionBar();
+        this.initResource();
         this.initResourceScreen();
+
         this.loadMovie();
-        this.createScreen();
-        this.actionBarEnabledDisplayHome(actionBar);
+        //this.createScreen();
+        //this.actionBarEnabledDisplayHome(actionBar);
+
+
+
     }
 
 
+    @Override
+    public void onPostFinished(Object detailMovies) {
+        DetailVideoReviewMovie detailMovie = (DetailVideoReviewMovie)detailMovies;
+        List<Review> listReview = detailMovie.getListReview();
+        int len = listReview.size();
+        String lenStr = ""+ len;
+    }
+
+    @Override
+    public void onSearchImages(Object pDetailMovies) {
+    }
+
+    @Override
+    public void onInitProgressBar() {
+    }
 }

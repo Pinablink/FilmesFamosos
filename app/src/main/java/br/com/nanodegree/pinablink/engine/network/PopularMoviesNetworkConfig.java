@@ -15,42 +15,26 @@ import br.com.nanodegree.pinablink.R;
  */
 public class PopularMoviesNetworkConfig {
 
-    /**
-     *
-     */
+
     private Uri uriFilterMoviePopular;
-
-    /**
-     *
-     */
     private Uri uriFilterMovieTopRated;
+    private Uri uriFilterMovieReview;
 
-    /**
-     *
-     */
     private AppCompatActivity activityRefer;
 
-    /**
-     *
-     */
+
     public PopularMoviesNetworkConfig(AppCompatActivity pActivityRefer) {
         super();
         this.activityRefer = pActivityRefer;
         this.init();
     }
 
-    /**
-     *
-     */
+
     private void init() {
         this.uriFilterMoviePopular = this.createUriFilterMoviePopular();
         this.uriFilterMovieTopRated = this.createUriFilterMovieTopRated();
     }
 
-    /**
-     *
-     * @return
-     */
     public URL getURLPopularMovies () {
 
         URL urlReturn = null;
@@ -64,10 +48,6 @@ public class PopularMoviesNetworkConfig {
         return urlReturn;
     }
 
-    /**
-     *
-     * @return
-     */
     public URL getURLTopRatedMovies () {
         URL urlReturn = null;
 
@@ -79,10 +59,20 @@ public class PopularMoviesNetworkConfig {
         return urlReturn;
     }
 
-    /**
-     *
-     * @return
-     */
+    public URL getURLMovieReview (String id) {
+        URL urlReturn = null;
+        String internalID = id;
+        Uri uUri = this.createUriFilterMovieReview(internalID);
+
+        try {
+            urlReturn = new URL (uUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        return urlReturn;
+    }
+
     private Uri createUriFilterMoviePopular() {
         final String cfg_pathString =   this.activityRefer.getString(R.string.cfg_app_path_url_popular_movies);
         final String cfg_appApiKey  =   this.activityRefer.getString(R.string.cfg_app_api_key);
@@ -94,16 +84,26 @@ public class PopularMoviesNetworkConfig {
         return uriReturn;
     }
 
-    /**
-     *
-     * @return
-     */
     private Uri createUriFilterMovieTopRated() {
         final String cfg_pathString =   this.activityRefer.getString(R.string.cfg_app_path_url_top_rated_movies);
         final String cfg_appApiKey  =   this.activityRefer.getString(R.string.cfg_app_api_key);
         final String value_apiKey   =   this.activityRefer.getString(R.string.cfg_app_api_key_value);
 
         Uri uriReturn = Uri.parse(cfg_pathString).buildUpon()
+                .appendQueryParameter(cfg_appApiKey, value_apiKey).build();
+
+        return uriReturn;
+    }
+
+    private Uri createUriFilterMovieReview(String id) {
+        String model =  "%s%s%s";
+        final String cfg_pathString1 = this.activityRefer.getString(R.string.cfg_app_path_url_review1);
+        final String cfg_pathString2 = this.activityRefer.getString(R.string.cfg_app_path_url_review2);
+        final String cfg_appApiKey  =   this.activityRefer.getString(R.string.cfg_app_api_key);
+        final String value_apiKey   =   this.activityRefer.getString(R.string.cfg_app_api_key_value);
+        String pathUrlStr = String.format(model, cfg_pathString1, id, cfg_pathString2);
+
+        Uri uriReturn = Uri.parse(pathUrlStr).buildUpon()
                 .appendQueryParameter(cfg_appApiKey, value_apiKey).build();
 
         return uriReturn;

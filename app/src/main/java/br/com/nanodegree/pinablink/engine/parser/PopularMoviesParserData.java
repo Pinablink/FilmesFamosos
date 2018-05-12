@@ -1,20 +1,15 @@
 package br.com.nanodegree.pinablink.engine.parser;
 
-
-import android.support.v7.app.AppCompatActivity;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-
-import br.com.nanodegree.pinablink.R;
+import br.com.nanodegree.pinablink.dataObject.DetailVideoReviewMovie;
 import br.com.nanodegree.pinablink.dataObject.Movie;
 import br.com.nanodegree.pinablink.dataObject.PopularMovies;
+import br.com.nanodegree.pinablink.dataObject.Review;
 import br.com.nanodegree.pinablink.engine.annotation.Param;
 import br.com.nanodegree.pinablink.engine.annotation.ParamInJson;
 import br.com.nanodegree.pinablink.exception.PMJSonErrorReader;
@@ -24,14 +19,31 @@ import br.com.nanodegree.pinablink.exception.PMJSonErrorReader;
  */
 public class PopularMoviesParserData {
 
-
     private String contentJson;
-
+    private static final String ARRAY_PARAM_JSON = "results";
 
     public PopularMoviesParserData() {
         super();
     }
 
+
+    public DetailVideoReviewMovie processDetail (String pContentJson) {
+
+        DetailVideoReviewMovie detailVideoReviewMovie;
+
+        try {
+            if (pContentJson != null && !pContentJson.isEmpty()) {
+                this.contentJson = pContentJson;
+                detailVideoReviewMovie = this.runDetail();
+            } else {
+                detailVideoReviewMovie = null;
+            }
+        } catch (PMJSonErrorReader e) {
+            detailVideoReviewMovie = null;
+        }
+
+        return detailVideoReviewMovie;
+    }
 
     public PopularMovies process(String pContentJson) {
 
@@ -49,6 +61,62 @@ public class PopularMoviesParserData {
         }
 
         return popularMoviesObject;
+    }
+
+    private void loadDataReview (Method[] methods,
+                                 Review review,
+                                 JSONObject jsonObject) throws JSONException{
+
+        for (Method method : methods) {
+            boolean existAnnotation = method.isAnnotationPresent(ParamInJson.class);
+
+            try {
+                if (existAnnotation) {
+                    ParamInJson paramInJson = method.getAnnotation(ParamInJson.class);
+                    String referNameJson = paramInJson.name();
+                    String value = jsonObject.getString(referNameJson);
+                    method.invoke(review, value);
+                }
+
+            } catch (Exception e) {
+                throw new JSONException(e.getMessage());
+            }
+        }
+    }
+
+    private DetailVideoReviewMovie runDetail()
+            throws PMJSonErrorReader {
+
+        DetailVideoReviewMovie detailVideoReviewMovie = null;
+
+        try {
+            JSONObject jsonDetailObject = new JSONObject(this.contentJson);
+            JSONArray jsonArrayObject = jsonDetailObject.getJSONArray(PopularMoviesParserData.ARRAY_PARAM_JSON);
+            int len = jsonArrayObject.length();
+
+            if (len == 0) {
+                throw new PMJSonErrorReader();
+            } else {
+                int index = 0;
+                detailVideoReviewMovie = new DetailVideoReviewMovie();
+                List<Review> listReview = new ArrayList<Review>();
+                Method[] methods = Review.class.getMethods();
+
+                for (;index <= (len - 1); index++) {
+                    JSONObject detailObject = (JSONObject)jsonArrayObject.get(index);
+                    Review reviewObject = new Review();
+                    this.loadDataReview(methods, reviewObject, detailObject);
+                    listReview.add(reviewObject);
+                }
+
+                detailVideoReviewMovie.setListReview(listReview);
+            }
+
+        } catch (JSONException e) {
+            throw new PMJSonErrorReader();
+        }
+
+        return detailVideoReviewMovie;
     }
 
     private PopularMovies run()

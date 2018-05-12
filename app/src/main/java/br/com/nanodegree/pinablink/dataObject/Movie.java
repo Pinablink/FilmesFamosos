@@ -2,8 +2,9 @@ package br.com.nanodegree.pinablink.dataObject;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
 import com.squareup.picasso.RequestCreator;
+
+import java.util.List;
 
 import br.com.nanodegree.pinablink.engine.annotation.Param;
 import br.com.nanodegree.pinablink.engine.annotation.ParamInJson;
@@ -13,63 +14,21 @@ import br.com.nanodegree.pinablink.engine.annotation.ParamInJson;
  */
 public final class Movie implements Parcelable {
 
-    /**
-     *
-     */
     private String voteCount;
-    /**
-     *
-     */
     private String id;
-    /**
-     *
-     */
     private boolean video;
-    /**
-     *
-     */
     private String voteAverage;
-    /**
-     *
-     */
     private String title;
-    /**
-     *
-     */
     private String popularity;
-    /**
-     *
-     */
     private String posterPath;
-    /**
-     *
-     */
     private String originalLanguage;
-    /**
-     *
-     */
     private String orginalTitle;
-    /**
-     *
-     */
     private String backdropPath;
-    /**
-     *
-     */
     private boolean adult;
-    /**
-     *
-     */
     private String overview;
-    /**
-     *
-     */
     private String releaseDate;
-
-    /**
-     *
-     */
     private RequestCreator refRequesImg;
+    private List<Review> listReview;
 
     /**
      *
@@ -341,6 +300,14 @@ public final class Movie implements Parcelable {
         return 0;
     }
 
+    public List<Review> getListReview() {
+        return listReview;
+    }
+
+    public void setListReview(List<Review> listReview) {
+        this.listReview = listReview;
+    }
+
     /**
      * Flatten this object in to a Parcel.
      *
@@ -353,6 +320,7 @@ public final class Movie implements Parcelable {
         dest.writeString(voteCount);
         dest.writeString(id);
         dest.writeByte((byte) (video ? 1 : 0));
+
         dest.writeString(voteAverage);
         dest.writeString(title);
         dest.writeString(popularity);

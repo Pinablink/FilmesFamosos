@@ -1,7 +1,6 @@
 package br.com.nanodegree.pinablink;
 
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -9,42 +8,28 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
-
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
-
 import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
-
 import br.com.nanodegree.pinablink.dataObject.Movie;
 import br.com.nanodegree.pinablink.dataObject.PopularMovies;
 import br.com.nanodegree.pinablink.engine.adapter.PopularMoviesPosterAdapter;
-import br.com.nanodegree.pinablink.engine.network.PopularMoviesNetworkRun;
-import br.com.nanodegree.pinablink.engine.network.task.AsyncTaskNetworkDelegator;
-import br.com.nanodegree.pinablink.engine.parser.PopularMoviesParserData;
-import br.com.nanodegree.pinablink.engine.network.PopularMoviesNetworkConfig;
+import br.com.nanodegree.pinablink.engine.network.task.ActivityTask;
 import br.com.nanodegree.pinablink.engine.network.task.PopularMoviesNetworkTask;
 import br.com.nanodegree.pinablink.engine.util.PopularMoviesCertAcessNetwork;
 import br.com.nanodegree.pinablink.engine.util.PopularMoviesMsg;
 
 
 public class MainActivity
-        extends AppCompatActivity implements AsyncTaskNetworkDelegator {
+        extends ActivityTask {
 
-    private PopularMoviesParserData parserData;
-    private PopularMoviesNetworkConfig networkConfig;
-    private PopularMoviesNetworkRun networkRun;
+
     private RecyclerView recycleViewPosterPresentation;
     private ProgressBar progressProcess;
 
-    private void initResource() {
-        this.parserData = new PopularMoviesParserData();
-        this.networkConfig = new PopularMoviesNetworkConfig(MainActivity.this);
-        this.networkRun = new PopularMoviesNetworkRun();
-    }
-
-    private void initResourceScreen() {
+    protected void initResourceScreen() {
         this.recycleViewPosterPresentation = (RecyclerView) findViewById(R.id.recyclerview_presentation_movies);
         this.progressProcess = (ProgressBar) findViewById(R.id.mProgress);
     }
@@ -111,7 +96,7 @@ public class MainActivity
     }
 
     @Override
-    public void onPostFinished(PopularMovies popularMovies) {
+    public void onPostFinished(Object popularMovies) {
         this.progressProcess.setVisibility(View.INVISIBLE);
 
         if (popularMovies == null) {
@@ -119,7 +104,8 @@ public class MainActivity
             new PopularMoviesMsg().showMessageErro(msgErroJsonParser, MainActivity.this);
         } else {
             this.recycleViewPosterPresentation.setVisibility(View.VISIBLE);
-            List<Movie> refListMovies = popularMovies.getListMovie();
+            PopularMovies popMovies = (PopularMovies)popularMovies;
+            List<Movie> refListMovies = popMovies.getListMovie();
             PopularMoviesPosterAdapter popularMoviesPosterAdapter = new PopularMoviesPosterAdapter(refListMovies);
             GridLayoutManager layoutManager = new GridLayoutManager(MainActivity.this, 2);
             this.recycleViewPosterPresentation.setLayoutManager(layoutManager);
@@ -128,8 +114,9 @@ public class MainActivity
     }
 
     @Override
-    public void onSearchImages(PopularMovies pPopularMovies) {
-        List<Movie> listMovie = pPopularMovies.getListMovie();
+    public void onSearchImages(Object pPopularMovies) {
+        PopularMovies popMovies = (PopularMovies)pPopularMovies;
+        List<Movie> listMovie = popMovies.getListMovie();
         Iterator<Movie> iterMovie = listMovie.iterator();
 
         while (iterMovie.hasNext()) {
