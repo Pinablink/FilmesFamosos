@@ -19,6 +19,8 @@ public class PopularMoviesNetworkConfig {
     private Uri uriFilterMoviePopular;
     private Uri uriFilterMovieTopRated;
     private Uri uriFilterMovieReview;
+    private Uri uriFilterMovieTrailer;
+
 
     private AppCompatActivity activityRefer;
 
@@ -61,8 +63,20 @@ public class PopularMoviesNetworkConfig {
 
     public URL getURLMovieReview (String id) {
         URL urlReturn = null;
-        String internalID = id;
-        Uri uUri = this.createUriFilterMovieReview(internalID);
+        Uri uUri = this.createUriFilterMovieReview(id);
+
+        try {
+            urlReturn = new URL (uUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        return urlReturn;
+    }
+
+    public URL getURLMovieTrailer (String id) {
+        URL urlReturn = null;
+        Uri uUri = this.createUriFilterMovieTrailer(id);
 
         try {
             urlReturn = new URL (uUri.toString());
@@ -108,4 +122,19 @@ public class PopularMoviesNetworkConfig {
 
         return uriReturn;
     }
+
+    private Uri createUriFilterMovieTrailer (String id) {
+        String model = "%s%s%s";
+        final String cfg_pathString1 = this.activityRefer.getString(R.string.cfg_app_path_url_video1);
+        final String cfg_pathString2 = this.activityRefer.getString(R.string.cfg_app_path_url_video2);
+        final String cfg_appApiKey  =   this.activityRefer.getString(R.string.cfg_app_api_key);
+        final String value_apiKey = this.activityRefer.getString(R.string.cfg_app_api_key_value);
+        String pathUrlStr = String.format(model, cfg_pathString1, id, cfg_pathString2);
+
+        Uri uriReturn = Uri.parse(pathUrlStr).buildUpon()
+                .appendQueryParameter(cfg_appApiKey, value_apiKey).build();
+
+        return uriReturn;
+    }
+
 }

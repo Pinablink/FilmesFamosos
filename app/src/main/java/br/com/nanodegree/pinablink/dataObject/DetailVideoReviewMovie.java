@@ -8,6 +8,7 @@ import java.util.List;
 public class DetailVideoReviewMovie {
 
     private boolean existListReview;
+    private boolean existListTrailerMovie;
     private List<Review> listReview;
     private List<MovieTrailer> listMovieTrailer;
 
@@ -33,5 +34,13 @@ public class DetailVideoReviewMovie {
 
     public void setListMovieTrailer(List<MovieTrailer> listMovieTrailer) {
         this.listMovieTrailer = listMovieTrailer;
+    }
+
+    public boolean isExistListTrailerMovie() {
+        return existListTrailerMovie;
+    }
+
+    public void setExistListTrailerMovie(boolean existListTrailerMovie) {
+        this.existListTrailerMovie = existListTrailerMovie;
     }
 }

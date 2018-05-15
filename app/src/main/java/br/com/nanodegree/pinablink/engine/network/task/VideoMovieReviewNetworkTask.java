@@ -50,8 +50,9 @@ public class VideoMovieReviewNetworkTask
     protected Movie doInBackground(Movie... dataInput) {
         Movie movie = (Movie)dataInput[0];
         String idMovie = movie.getId();
-        URL url = this.popularMoviesNetworkConfig.getURLMovieReview(idMovie);
-        String data = this.networkRun.getResponseDataInTheMovieDB(url);
+        URL urlReview = this.popularMoviesNetworkConfig.getURLMovieReview(idMovie);
+        URL urlTrailer = this.popularMoviesNetworkConfig.getURLMovieTrailer(idMovie);
+        String data = this.networkRun.getResponseDataInTheMovieDB(urlReview);
         DetailVideoReviewMovie detailMovie = this.parserData.processDetail(data);
 
         if (detailMovie == null) {
@@ -59,6 +60,8 @@ public class VideoMovieReviewNetworkTask
         }
 
         movie.setDetailVideoReviewMovie(detailMovie);
+        String dataTrailer = this.networkRun.getResponseDataInTheMovieDB(urlTrailer);
+        this.parserData.processDetailTrailer(dataTrailer, detailMovie);
 
         this.activityRefer.onSearchImages(movie);
 

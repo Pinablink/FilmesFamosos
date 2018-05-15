@@ -1,10 +1,16 @@
 package br.com.nanodegree.pinablink.dataObject;
 
+import com.squareup.picasso.RequestCreator;
+import br.com.nanodegree.pinablink.engine.annotation.Format;
 import br.com.nanodegree.pinablink.engine.annotation.ParamInJson;
+import br.com.nanodegree.pinablink.engine.annotation.SourceVideo;
+import br.com.nanodegree.pinablink.engine.util.ChannelVideo;
+import br.com.nanodegree.pinablink.engine.util.TypeVideoView;
 
 /**
  * Created by Pinablink on 14/05/2018.
  */
+@SourceVideo(channelVideo = ChannelVideo.YOUTUBE, typeVideoView = TypeVideoView.TRAILER)
 public class MovieTrailer {
 
     private String id;
@@ -13,7 +19,9 @@ public class MovieTrailer {
     private String key;
     private String name;
     private String site;
-    private int size;
+    private String size;
+    private String pathThumbnail;
+    private RequestCreator refRequestImg;
 
     public String getId() {
         return id;
@@ -69,12 +77,29 @@ public class MovieTrailer {
         this.site = site;
     }
 
-    public int getSize() {
+    public String getSize() {
         return size;
     }
 
     @ParamInJson(name="size")
-    public void setSize(int size) {
+    public void setSize(String size) {
         this.size = size;
+    }
+
+    public String getPathThumbnail() {
+        return pathThumbnail;
+    }
+
+    @Format(input="key", valueFormat = "http://img.youtube.com/vi/%s/default.jpg")
+    public void setPathThumbnail(String pathThumbnail) {
+        this.pathThumbnail = pathThumbnail;
+    }
+
+    public RequestCreator getRefRequestImg() {
+        return refRequestImg;
+    }
+
+    public void setRefRequestImg(RequestCreator refRequestImg) {
+        this.refRequestImg = refRequestImg;
     }
 }

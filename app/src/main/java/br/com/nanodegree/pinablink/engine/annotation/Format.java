@@ -6,15 +6,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by Pinablink on 13/04/2018.
+ * Created by Pinablink on 15/05/2018.
  */
 @Target(ElementType.METHOD)
 @Retention(value = RetentionPolicy.RUNTIME)
-public @interface ParamInJson {
-
-    String name();
-    String concatLeft() default "";
-    String concatRight() default "";
-    int  valueType() default Param.VALUE_TYPE_STRING;
-    boolean isArrayData() default false;
+public @interface Format {
+    String input() default "";
+    String valueFormat() default "";
 }

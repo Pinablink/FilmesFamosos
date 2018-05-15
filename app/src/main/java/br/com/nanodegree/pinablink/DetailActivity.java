@@ -12,9 +12,12 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
+
+import java.util.Iterator;
 import java.util.List;
 import br.com.nanodegree.pinablink.dataObject.DetailVideoReviewMovie;
 import br.com.nanodegree.pinablink.dataObject.Movie;
+import br.com.nanodegree.pinablink.dataObject.MovieTrailer;
 import br.com.nanodegree.pinablink.dataObject.Review;
 import br.com.nanodegree.pinablink.engine.adapter.PopularMoviesReviewAdapter;
 import br.com.nanodegree.pinablink.engine.network.task.ActivityTask;
@@ -85,7 +88,8 @@ public class DetailActivity
             List<Review> reviewList =  detailVideoReviewMovie.getListReview();
             PopularMoviesReviewAdapter adapter = new PopularMoviesReviewAdapter (reviewList);
 
-            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getApplicationContext()){
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getApplicationContext(),
+                    LinearLayoutManager.VERTICAL, false){
                 @Override
                 public boolean canScrollVertically() {
                     return false;
@@ -146,8 +150,23 @@ public class DetailActivity
     public void onSearchImages(Object pDetailMovies) {
         Movie movie = (Movie) pDetailMovies;
         String strBackDropImage = movie.getBackdropPath();
+
         RequestCreator refRequestImg = Picasso.with(this.getApplicationContext()).load(strBackDropImage);
         movie.setRefRequesImg(refRequestImg);
+
+        DetailVideoReviewMovie detailMovie = movie.getDetailVideoReviewMovie();
+        List<MovieTrailer> listMovieTrailer =  detailMovie.getListMovieTrailer();
+
+        if (detailMovie.isExistListTrailerMovie()) {
+            Iterator<MovieTrailer> iterList = listMovieTrailer.iterator();
+
+            while (iterList.hasNext()) {
+                MovieTrailer movieTrailer = iterList.next();
+                String pathThumbnail = movieTrailer.getPathThumbnail();
+                RequestCreator refRequest1 = Picasso.with(this.getApplicationContext()).load(pathThumbnail);
+                movieTrailer.setRefRequestImg(refRequest1);
+            }
+        }
     }
 
     @Override

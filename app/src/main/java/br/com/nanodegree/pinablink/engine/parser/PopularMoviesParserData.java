@@ -8,10 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 import br.com.nanodegree.pinablink.dataObject.DetailVideoReviewMovie;
 import br.com.nanodegree.pinablink.dataObject.Movie;
+import br.com.nanodegree.pinablink.dataObject.MovieTrailer;
 import br.com.nanodegree.pinablink.dataObject.PopularMovies;
 import br.com.nanodegree.pinablink.dataObject.Review;
+import br.com.nanodegree.pinablink.engine.annotation.Format;
 import br.com.nanodegree.pinablink.engine.annotation.Param;
 import br.com.nanodegree.pinablink.engine.annotation.ParamInJson;
+import br.com.nanodegree.pinablink.engine.annotation.SourceVideo;
+import br.com.nanodegree.pinablink.engine.util.TypeVideoView;
 import br.com.nanodegree.pinablink.exception.PMJSonErrorReader;
 
 /**
@@ -45,6 +49,105 @@ public class PopularMoviesParserData {
         }
 
         return detailVideoReviewMovie;
+    }
+
+    public void processDetailTrailer (String pContentJson,
+                                      DetailVideoReviewMovie pDetailVideoReviewMovie) {
+
+        try {
+
+            if (pContentJson != null && !pContentJson.isEmpty()) {
+                this.contentJson = pContentJson;
+                this.runDetailTrailer(pDetailVideoReviewMovie);
+            } else {
+                pDetailVideoReviewMovie.setExistListReview(false);
+            }
+
+        } catch (PMJSonErrorReader e) {
+            pDetailVideoReviewMovie.setExistListReview(false);
+        }
+
+    }
+
+    public void runDetailTrailer (DetailVideoReviewMovie pDetailVideoReviewMovie)
+            throws PMJSonErrorReader {
+
+        try {
+         JSONObject jsonDetailObject = new JSONObject(this.contentJson);
+         JSONArray jsonArrayObject = jsonDetailObject.getJSONArray(PopularMoviesParserData.ARRAY_PARAM_JSON);
+
+         int len = jsonArrayObject.length();
+
+         if (len == 0) {
+             throw new PMJSonErrorReader();
+         } else {
+            int index = 0;
+            List<MovieTrailer> listMovieTrailer = new ArrayList<MovieTrailer>();
+
+             for (;index <= (len - 1); index++) {
+                 JSONObject detailObject = (JSONObject)jsonArrayObject.get(index);
+                 MovieTrailer movieTrailer = new MovieTrailer();
+                 boolean annotationClass =
+                         movieTrailer.getClass().isAnnotationPresent(SourceVideo.class);
+
+                 if (annotationClass) {
+                     SourceVideo sourceVideo =
+                             movieTrailer.getClass().getAnnotation(SourceVideo.class);
+
+                     TypeVideoView typeVideoView = sourceVideo.typeVideoView();
+                     String typeVideo = detailObject.getString("type");
+
+                     if (typeVideo.equalsIgnoreCase(typeVideoView.value)) {
+                        Method[] methods = movieTrailer.getClass().getMethods();
+                        this.loadDetailTrailer(methods, movieTrailer, detailObject);
+
+                        listMovieTrailer.add(movieTrailer);
+                     }
+
+                 } else {
+                     throw new PMJSonErrorReader();
+                 }
+             }
+
+             boolean existsItemList = (listMovieTrailer.size() > 0);
+             pDetailVideoReviewMovie.setExistListTrailerMovie(existsItemList);
+             pDetailVideoReviewMovie.setListMovieTrailer(listMovieTrailer);
+         }
+
+        } catch (JSONException e) {
+            throw new PMJSonErrorReader();
+        }
+    }
+
+    public void loadDetailTrailer (Method[] methods,
+                                   MovieTrailer movieTrailer,
+                                   JSONObject jsonObject) throws JSONException {
+
+        for (Method mMethod : methods) {
+            boolean existsAnnotationParam = mMethod.isAnnotationPresent(ParamInJson.class);
+            boolean existsAnnotationFormat = mMethod.isAnnotationPresent(Format.class);
+
+            try {
+
+                if (existsAnnotationParam) {
+                    ParamInJson paramMethod = mMethod.getAnnotation(ParamInJson.class);
+                    String param = paramMethod.name();
+                    String value = jsonObject.getString(param);
+                    mMethod.invoke(movieTrailer, value);
+                } else if (existsAnnotationFormat) {
+                    Format paramMethod = mMethod.getAnnotation(Format.class);
+                    String valFormat = paramMethod.valueFormat();
+                    String param = paramMethod.input();
+                    String value = jsonObject.getString(param);
+                    value = String.format(valFormat, value);
+                    mMethod.invoke(movieTrailer, value);
+                }
+
+            } catch (Exception e) {
+                throw new JSONException(e.getMessage());
+            }
+        }
+
     }
 
     public PopularMovies process(String pContentJson) {
