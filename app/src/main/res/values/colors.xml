@@ -5,4 +5,5 @@
     <color name="colorAccent">#9E9E9E</color>
     <color name="colorActivity">#424242</color>
     <color name="colorTextDetail">#FFFFFF</color>
+    <color name="textReviewInput">#FFD600</color>
 </resources>

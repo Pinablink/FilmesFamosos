@@ -32,12 +32,14 @@ public class PopularMoviesParserData {
         DetailVideoReviewMovie detailVideoReviewMovie;
 
         try {
+
             if (pContentJson != null && !pContentJson.isEmpty()) {
                 this.contentJson = pContentJson;
                 detailVideoReviewMovie = this.runDetail();
             } else {
-                detailVideoReviewMovie = null;
+                detailVideoReviewMovie = new DetailVideoReviewMovie();
             }
+
         } catch (PMJSonErrorReader e) {
             detailVideoReviewMovie = null;
         }
@@ -109,6 +111,8 @@ public class PopularMoviesParserData {
                     listReview.add(reviewObject);
                 }
 
+                boolean existsList = (listReview.size() > 0);
+                detailVideoReviewMovie.setExistListReview(existsList);
                 detailVideoReviewMovie.setListReview(listReview);
             }
 

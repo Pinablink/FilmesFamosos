@@ -1,5 +1,6 @@
 package br.com.nanodegree.pinablink.engine.network.task;
 
+
 import android.os.AsyncTask;
 import java.net.URL;
 import br.com.nanodegree.pinablink.dataObject.DetailVideoReviewMovie;
@@ -12,7 +13,7 @@ import br.com.nanodegree.pinablink.engine.parser.PopularMoviesParserData;
  * Created by Pinablink on 12/05/2018.
  */
 public class VideoMovieReviewNetworkTask
-        extends AsyncTask<Movie, Void, DetailVideoReviewMovie> {
+        extends AsyncTask<Movie, Void, Movie> {
 
 
     private PopularMoviesNetworkConfig popularMoviesNetworkConfig;
@@ -39,25 +40,38 @@ public class VideoMovieReviewNetworkTask
      * This method can call {@link #publishProgress} to publish updates
      * on the UI thread.
      *
-     * @param movies The parameters of the task.
+     * @param dataInput The parameters of the task.
      * @return A result, defined by the subclass of this task.
      * @see #onPreExecute()
      * @see #onPostExecute
      * @see #publishProgress
      */
     @Override
-    protected DetailVideoReviewMovie doInBackground(Movie... movies) {
-        Movie movie = movies[0];
+    protected Movie doInBackground(Movie... dataInput) {
+        Movie movie = (Movie)dataInput[0];
         String idMovie = movie.getId();
         URL url = this.popularMoviesNetworkConfig.getURLMovieReview(idMovie);
         String data = this.networkRun.getResponseDataInTheMovieDB(url);
         DetailVideoReviewMovie detailMovie = this.parserData.processDetail(data);
 
-        return detailMovie;
+        if (detailMovie == null) {
+            detailMovie = new DetailVideoReviewMovie();
+        }
+
+        movie.setDetailVideoReviewMovie(detailMovie);
+
+        this.activityRefer.onSearchImages(movie);
+
+        return movie;
     }
 
     @Override
-    protected void onPostExecute(DetailVideoReviewMovie detailVideoReviewMovie) {
-        this.activityRefer.onPostFinished(detailVideoReviewMovie);
+    protected void onPreExecute() {
+        this.activityRefer.onInitProgressBar();
+    }
+
+    @Override
+    protected void onPostExecute(Movie reviewMovie) {
+        this.activityRefer.onPostFinished(reviewMovie);
     }
 }

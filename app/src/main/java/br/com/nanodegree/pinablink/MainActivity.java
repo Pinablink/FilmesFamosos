@@ -103,13 +103,13 @@ public class MainActivity
             String msgErroJsonParser = this.getString(R.string.app_json_not_exists);
             new PopularMoviesMsg().showMessageErro(msgErroJsonParser, MainActivity.this);
         } else {
-            this.recycleViewPosterPresentation.setVisibility(View.VISIBLE);
             PopularMovies popMovies = (PopularMovies)popularMovies;
             List<Movie> refListMovies = popMovies.getListMovie();
             PopularMoviesPosterAdapter popularMoviesPosterAdapter = new PopularMoviesPosterAdapter(refListMovies);
             GridLayoutManager layoutManager = new GridLayoutManager(MainActivity.this, 2);
             this.recycleViewPosterPresentation.setLayoutManager(layoutManager);
             this.recycleViewPosterPresentation.setAdapter(popularMoviesPosterAdapter);
+            this.recycleViewPosterPresentation.setVisibility(View.VISIBLE);
         }
     }
 

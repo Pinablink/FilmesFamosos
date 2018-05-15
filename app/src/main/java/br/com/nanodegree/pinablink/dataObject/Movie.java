@@ -3,9 +3,6 @@ package br.com.nanodegree.pinablink.dataObject;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.squareup.picasso.RequestCreator;
-
-import java.util.List;
-
 import br.com.nanodegree.pinablink.engine.annotation.Param;
 import br.com.nanodegree.pinablink.engine.annotation.ParamInJson;
 
@@ -28,7 +25,7 @@ public final class Movie implements Parcelable {
     private String overview;
     private String releaseDate;
     private RequestCreator refRequesImg;
-    private List<Review> listReview;
+    private DetailVideoReviewMovie detailVideoReviewMovie;
 
     /**
      *
@@ -45,17 +42,10 @@ public final class Movie implements Parcelable {
         }
     };
 
-    /**
-     *
-     */
     public Movie() {
         super();
     }
 
-    /**
-     *
-     * @param in
-     */
     protected Movie(Parcel in) {
         voteCount = in.readString();
         id = in.readString();
@@ -72,215 +62,127 @@ public final class Movie implements Parcelable {
         releaseDate = in.readString();
     }
 
-
-    /**
-     * @return
-     */
     public String getVoteCount() {
         return voteCount;
     }
 
-    /**
-     * @param voteCount
-     */
     @ParamInJson(name = "vote_count")
     public void setVoteCount(String voteCount) {
         this.voteCount = voteCount;
     }
 
-    /**
-     * @return
-     */
     public String getId() {
         return id;
     }
 
-    /**
-     * @param id
-     */
     @ParamInJson(name = "id")
     public void setId(String id) {
         this.id = id;
     }
 
-    /**
-     * @param video
-     */
     @ParamInJson(name = "video", valueType = Param.VALUE_TYPE_BOOLEAN)
     public void setVideo(boolean video) {
         this.video = video;
     }
 
-    /**
-     * @return
-     */
     public String getVoteAverage() {
         return voteAverage;
     }
 
-    /**
-     * @param voteAverage
-     */
     @ParamInJson(name = "vote_average")
     public void setVoteAverage(String voteAverage) {
         this.voteAverage = voteAverage;
     }
 
-    /**
-     * @return
-     */
     public String getTitle() {
         return title;
     }
 
-    /**
-     * @param title
-     */
     @ParamInJson(name = "title")
     public void setTitle(String title) {
         this.title = title;
     }
 
-    /**
-     * @return
-     */
     public String getPopularity() {
         return popularity;
     }
 
-    /**
-     * @param popularity
-     */
     @ParamInJson(name = "popularity")
     public void setPopularity(String popularity) {
         this.popularity = popularity;
     }
 
-    /**
-     * @return
-     */
     public String getPosterPath() {
         return posterPath;
     }
 
-    /**
-     * @param posterPath
-     */
     @ParamInJson(name = "poster_path", concatLeft = "http://image.tmdb.org/t/p/w185")
     public void setPosterPath(String posterPath) {
         this.posterPath = posterPath;
     }
 
-    /**
-     * @return
-     */
     public String getOriginalLanguage() {
         return originalLanguage;
     }
 
-    /**
-     * @param originalLanguage
-     */
     @ParamInJson(name = "original_language")
     public void setOriginalLanguage(String originalLanguage) {
         this.originalLanguage = originalLanguage;
     }
 
-    /**
-     * @return
-     */
     public String getOrginalTitle() {
         return orginalTitle;
     }
 
-    /**
-     * @param orginalTitle
-     */
     @ParamInJson(name = "original_title")
     public void setOrginalTitle(String orginalTitle) {
         this.orginalTitle = orginalTitle;
     }
 
-    /**
-     * @return
-     */
     public String getBackdropPath() {
         return backdropPath;
     }
 
-    /**
-     * @param backdropPath
-     */
     @ParamInJson(name = "backdrop_path", concatLeft = "http://image.tmdb.org/t/p/w185")
     public void setBackdropPath(String backdropPath) {
         this.backdropPath = backdropPath;
     }
 
-    /**
-     * @return
-     */
     public boolean isAdult() {
         return adult;
     }
 
-    /**
-     * @param adult
-     */
     @ParamInJson(name = "adult", valueType = Param.VALUE_TYPE_BOOLEAN)
     public void setAdult(boolean adult) {
         this.adult = adult;
     }
 
-    /**
-     * @return
-     */
     public String getOverview() {
         return overview;
     }
 
-    /**
-     * @param overview
-     */
     @ParamInJson(name = "overview")
     public void setOverview(String overview) {
         this.overview = overview;
     }
 
-    /**
-     * @return
-     */
     public String getReleaseDate() {
         return releaseDate;
     }
 
-    /**
-     * @param releaseDate
-     */
     @ParamInJson(name = "release_date")
     public void setReleaseDate(String releaseDate) {
         this.releaseDate = releaseDate;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isVideo() {
         return video;
     }
 
-    /**
-     *
-     * @return
-     */
     public RequestCreator getRefRequesImg() {
         return refRequesImg;
     }
 
-    /**
-     *
-     * @param refRequesImg
-     */
     public void setRefRequesImg(RequestCreator refRequesImg) {
         this.refRequesImg = refRequesImg;
     }
@@ -300,12 +202,12 @@ public final class Movie implements Parcelable {
         return 0;
     }
 
-    public List<Review> getListReview() {
-        return listReview;
+    public DetailVideoReviewMovie getDetailVideoReviewMovie() {
+        return detailVideoReviewMovie;
     }
 
-    public void setListReview(List<Review> listReview) {
-        this.listReview = listReview;
+    public void setDetailVideoReviewMovie(DetailVideoReviewMovie detailVideoReviewMovie) {
+        this.detailVideoReviewMovie = detailVideoReviewMovie;
     }
 
     /**

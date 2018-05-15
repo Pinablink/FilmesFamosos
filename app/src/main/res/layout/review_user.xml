@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView android:id="@+id/userPostReview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorTextDetail"
+        android:padding="2dp"
+        android:textStyle="bold"/>
+
+    <TextView android:id="@+id/textReview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/msg_empty_review"
+        android:textColor="@color/textReviewInput"
+        android:padding="2dp"
+        android:textStyle="italic"/>
+
+</LinearLayout>

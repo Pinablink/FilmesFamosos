@@ -1,5 +1,7 @@
 package br.com.nanodegree.pinablink.engine.network.task;
 
+import android.content.Context;
+
 import br.com.nanodegree.pinablink.dataObject.PopularMovies;
 
 /**

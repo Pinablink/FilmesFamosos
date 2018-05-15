@@ -7,8 +7,10 @@
     android:padding="10dp">
 
     <ScrollView
+        android:id="@+id/scrollViewDetail"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:visibility="invisible">
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
@@ -42,7 +44,8 @@
                     android:layout_height="wrap_content"
                     android:padding="5dp"
                     android:text="@string/title_detail_sinopse"
-                    android:textColor="@color/colorTextDetail" />
+                    android:textColor="@color/colorTextDetail"
+                    android:textStyle="bold"/>
 
                 <TextView
                     android:id="@+id/mSinopse"
@@ -56,7 +59,8 @@
                     android:layout_height="wrap_content"
                     android:padding="2dp"
                     android:text="@string/title_vote_average"
-                    android:textColor="@color/colorTextDetail" />
+                    android:textColor="@color/colorTextDetail"
+                    android:textStyle="bold"/>
 
                 <TextView
                     android:id="@+id/mVoteAverage"
@@ -71,7 +75,8 @@
                     android:layout_height="wrap_content"
                     android:padding="2dp"
                     android:text="@string/title_release_date"
-                    android:textColor="@color/colorTextDetail" />
+                    android:textColor="@color/colorTextDetail"
+                    android:textStyle="bold"/>
 
                 <TextView
                     android:id="@+id/mReleaseDate"
@@ -81,10 +86,38 @@
                     android:text=""
                     android:textColor="@color/colorTextDetail" />
 
+                <TextView android:id="@+id/titleEmpty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:text="@string/title_review_movies"
+                    android:textColor="@color/colorTextDetail"
+                    android:textStyle="bold"/>
+
+                <TextView android:id="@+id/emptyReviewMsg"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:visibility="invisible"
+                    android:padding="2dp"
+                    android:text="@string/msg_empty_review"
+                    android:textColor="@color/colorTextDetail"/>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recyclerview_review_movie"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="invisible"/>
+
             </LinearLayout>
 
         </LinearLayout>
 
     </ScrollView>
+
+    <ProgressBar android:id="@+id/dProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:layout_gravity="center"/>
 
 </LinearLayout>
