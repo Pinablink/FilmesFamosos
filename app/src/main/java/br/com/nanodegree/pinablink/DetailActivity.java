@@ -1,10 +1,13 @@
 package br.com.nanodegree.pinablink;
 
+
 import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -12,7 +15,6 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
-
 import java.util.Iterator;
 import java.util.List;
 import br.com.nanodegree.pinablink.dataObject.DetailVideoReviewMovie;
@@ -20,6 +22,7 @@ import br.com.nanodegree.pinablink.dataObject.Movie;
 import br.com.nanodegree.pinablink.dataObject.MovieTrailer;
 import br.com.nanodegree.pinablink.dataObject.Review;
 import br.com.nanodegree.pinablink.engine.adapter.PopularMoviesReviewAdapter;
+import br.com.nanodegree.pinablink.engine.adapter.PopularMoviesTrailerAdapter;
 import br.com.nanodegree.pinablink.engine.network.task.ActivityTask;
 import br.com.nanodegree.pinablink.engine.network.task.VideoMovieReviewNetworkTask;
 import br.com.nanodegree.pinablink.engine.util.PopularMoviesCertAcessNetwork;
@@ -40,6 +43,9 @@ public class DetailActivity
     private ProgressBar progressBar;
     private ScrollView scrollView;
     private RecyclerView recycleViewReviewPresentation;
+    private RecyclerView recycleViewTrailerPresentation;
+    private MenuItem itemFav;
+    private MenuItem itemAddFav;
 
     protected void initResourceScreen() {
         this.textTitle = (TextView) findViewById(R.id.mTitle);
@@ -51,6 +57,7 @@ public class DetailActivity
         this.progressBar    = (ProgressBar) findViewById(R.id.dProgress);
         this.scrollView = (ScrollView) findViewById(R.id.scrollViewDetail);
         this.recycleViewReviewPresentation = (RecyclerView) findViewById(R.id.recyclerview_review_movie);
+        this.recycleViewTrailerPresentation = (RecyclerView) findViewById(R.id.recyclerview_trailer_movie);
     }
 
     private void loadMovie() {
@@ -70,22 +77,9 @@ public class DetailActivity
 
     }
 
-    private void inputDataScreen(Movie refMovie) {
-        String title = refMovie.getTitle();
-        String sinopse = refMovie.getOverview();
-        String voteAverage = refMovie.getVoteAverage();
-        String releaseDate = refMovie.getReleaseDate();
-
-        this.textTitle.setText(title);
-        this.textSinopse.setText(sinopse);
-        this.textVoteAverage.setText(voteAverage);
-        this.textReleaseDate.setText(releaseDate);
-
-        DetailVideoReviewMovie detailVideoReviewMovie =
-                refMovie.getDetailVideoReviewMovie();
-
-        if (detailVideoReviewMovie.isExistListReview()) {
-            List<Review> reviewList =  detailVideoReviewMovie.getListReview();
+    private void inputReview (DetailVideoReviewMovie refDetailVideoReviewMovie) {
+        if (refDetailVideoReviewMovie.isExistListReview()) {
+            List<Review> reviewList =  refDetailVideoReviewMovie.getListReview();
             PopularMoviesReviewAdapter adapter = new PopularMoviesReviewAdapter (reviewList);
 
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getApplicationContext(),
@@ -104,7 +98,41 @@ public class DetailActivity
         } else {
             this.textEmptyMsg.setVisibility(View.VISIBLE);
         }
+    }
 
+    private void inputTrailer (DetailVideoReviewMovie refDetailVideoReviewMovie) {
+        if (refDetailVideoReviewMovie.isExistListTrailerMovie()) {
+            List<MovieTrailer> movieTrailerList = refDetailVideoReviewMovie.getListMovieTrailer();
+            PopularMoviesTrailerAdapter adapter = new PopularMoviesTrailerAdapter(movieTrailerList);
+
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getApplicationContext(),
+                    LinearLayoutManager.HORIZONTAL, false);
+
+            this.recycleViewTrailerPresentation.setLayoutManager(linearLayoutManager);
+            this.recycleViewTrailerPresentation.setAdapter(adapter);
+            this.recycleViewTrailerPresentation.setVisibility(View.VISIBLE);
+        } else {
+            //
+        }
+    }
+
+    private void inputDataScreen(Movie refMovie) {
+        String title = refMovie.getTitle();
+        String sinopse = refMovie.getOverview();
+        String voteAverage = refMovie.getVoteAverage();
+        String releaseDate = refMovie.getReleaseDate();
+
+        this.textTitle.setText(title);
+        this.textSinopse.setText(sinopse);
+        this.textVoteAverage.setText(voteAverage);
+        this.textReleaseDate.setText(releaseDate);
+
+        DetailVideoReviewMovie detailVideoReviewMovie =
+                refMovie.getDetailVideoReviewMovie();
+
+
+        this.inputReview(detailVideoReviewMovie);
+        this.inputTrailer(detailVideoReviewMovie);
     }
 
     private void actionBarEnabledDisplayHome (ActionBar actionBar) {
@@ -172,5 +200,28 @@ public class DetailActivity
     @Override
     public void onInitProgressBar() {
         this.progressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_popular_movies_detail_app, menu);
+        this.itemFav = menu.findItem(R.id.menu_item_fav);
+        this.itemAddFav = menu.findItem(R.id.menu_item_add_fav);
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        final int idItem = item.getItemId();
+        final int idFavAction = R.id.menu_item_add_fav;
+        final int idFav = R.id.menu_item_fav;
+
+        if (idItem == idFavAction) {
+            item.setVisible(false);
+            this.itemFav.setVisible(true);
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

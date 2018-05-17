@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/menu_item_add_fav"
+        android:orderInCategory="1"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_outline_favorite_border_24px"
+        android:title="Adicionar ao Favorito"/>
+
+    <item android:id="@+id/menu_item_fav"
+        android:orderInCategory="1"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_outline_favorite_24px"
+        android:title="Favorito"
+        android:visible="false"/>
+
+</menu>

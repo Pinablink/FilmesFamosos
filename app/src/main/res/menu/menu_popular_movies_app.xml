@@ -9,4 +9,8 @@
         android:orderInCategory="2"
         app:showAsAction="collapseActionView"
         android:title="@string/menu_label_popular_top_rated"/>
+    <item android:id="@+id/menu_item_myFavorites"
+        android:orderInCategory="3"
+        app:showAsAction="collapseActionView"
+        android:title="@string/menu_label_favorites"/>
 </menu>

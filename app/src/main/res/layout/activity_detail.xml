@@ -95,15 +95,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingTop="8dp"
-                    android:paddingBottom="8dp"
+                    android:paddingBottom="1dp"
                     android:text="@string/title_trailer_movie"
                     android:textColor="@color/colorTextDetail"
                     android:textStyle="bold"/>
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/recyclerview_trailer_movie"
+                    android:layout_height="wrap_content"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
                     android:visibility="invisible"/>
 
                 <TextView android:id="@+id/titleReview_"
