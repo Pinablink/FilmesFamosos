@@ -9,7 +9,6 @@ import br.com.nanodegree.pinablink.dataObject.PopularMovies;
  */
 public interface AsyncTaskNetworkDelegator {
 
-    public void onPostFinished (Object popularMovies);
     public void onSearchImages (Object pPopularMovies);
     public void onInitProgressBar();
 

@@ -3,6 +3,7 @@ package br.com.nanodegree.pinablink.engine.listener;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.View;
 
 import br.com.nanodegree.pinablink.DetailActivity;
@@ -24,14 +25,17 @@ public class PopularMoviesPosterOnClick implements View.OnClickListener{
      */
     private Context refContext;
 
+    private PopularMoviesPosScrollOnClick refPopularMoviesPosScrollOnClick;
     /**
      *
      * @param movie
      * @param pContext
      */
-    public PopularMoviesPosterOnClick (Movie movie, Context pContext) {
+    public PopularMoviesPosterOnClick (Movie movie, Context pContext,
+                                       PopularMoviesPosScrollOnClick pPopularMoviesPosScrollOnClick) {
         this.refMovie = movie;
         this.refContext = pContext;
+        this.refPopularMoviesPosScrollOnClick = pPopularMoviesPosScrollOnClick;
     }
 
 
@@ -42,9 +46,11 @@ public class PopularMoviesPosterOnClick implements View.OnClickListener{
      */
     @Override
     public void onClick(View v) {
+        this.refPopularMoviesPosScrollOnClick.onPosScroll();
         Intent intent = new Intent(this.refContext,DetailActivity.class);
         String keyPutExtra = this.refContext.getString(R.string.name_movie_trans_activity);
         intent.putExtra(keyPutExtra, this.refMovie);
         this.refContext.startActivity(intent);
+
     }
 }

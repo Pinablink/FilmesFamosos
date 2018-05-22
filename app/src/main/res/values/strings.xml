@@ -7,7 +7,7 @@
     <string name="cfg_app_path_url_video1">http://api.themoviedb.org/3/movie/</string>
     <string name="cfg_app_path_url_video2">/videos</string>
     <string name="cfg_app_api_key">api_key</string>
-    <string name="cfg_app_api_key_value">INSERIR CHAVE AQUI</string>
+    <string name="cfg_app_api_key_value">INSERIR AQUI A CHAVE DA API</string>
     <string name="cfg_app_call_youtube_app">vnd.youtube://</string>
     <string name="cfg_app_call_youtube_webbrowser">http://www.youtube.com/watch</string>
     <string name="cfg_app_param_name_key">v</string>
@@ -23,6 +23,7 @@
     <string name="title_msg_erro">Erro</string>
     <string name="title_activity_main_default">Filmes Mais Populares</string>
     <string name="title_activity_main_top_rated">Filmes Melhores Avaliados</string>
+    <string name="title_activity_main_favorite">Meus Filmes Favoritos</string>
     <string name="title_activity_detail">Detalhes</string>
     <string name="title_detail_sinopse">Sinopse:</string>
     <string name="title_vote_average">Avaliação dos Usuários:</string>

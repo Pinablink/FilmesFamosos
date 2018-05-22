@@ -1,6 +1,7 @@
 package br.com.nanodegree.pinablink;
 
 
+
 import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
@@ -17,13 +18,16 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 import java.util.Iterator;
 import java.util.List;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.Loader;
 import br.com.nanodegree.pinablink.dataObject.DetailVideoReviewMovie;
 import br.com.nanodegree.pinablink.dataObject.Movie;
 import br.com.nanodegree.pinablink.dataObject.MovieTrailer;
 import br.com.nanodegree.pinablink.dataObject.Review;
 import br.com.nanodegree.pinablink.engine.adapter.PopularMoviesReviewAdapter;
 import br.com.nanodegree.pinablink.engine.adapter.PopularMoviesTrailerAdapter;
-import br.com.nanodegree.pinablink.engine.network.task.ActivityTask;
+import br.com.nanodegree.pinablink.engine.network.task.ActivityFilmesFamosos;
+import br.com.nanodegree.pinablink.engine.network.task.AsyncTaskNetworkDelegator;
 import br.com.nanodegree.pinablink.engine.network.task.VideoMovieReviewNetworkTask;
 import br.com.nanodegree.pinablink.engine.util.PopularMoviesCertAcessNetwork;
 import br.com.nanodegree.pinablink.engine.util.PopularMoviesMsg;
@@ -32,7 +36,8 @@ import br.com.nanodegree.pinablink.engine.util.PopularMoviesMsg;
  *
  */
 public class DetailActivity
-        extends ActivityTask {
+        extends ActivityFilmesFamosos
+        implements AsyncTaskNetworkDelegator, LoaderCallbacks<Movie> {
 
     private TextView textTitle;
     private TextView textSinopse;
@@ -46,6 +51,11 @@ public class DetailActivity
     private RecyclerView recycleViewTrailerPresentation;
     private MenuItem itemFav;
     private MenuItem itemAddFav;
+    //private URL urlDetail;
+    private Movie refMovie;
+
+    protected void loadUrl () {
+    }
 
     protected void initResourceScreen() {
         this.textTitle = (TextView) findViewById(R.id.mTitle);
@@ -61,18 +71,17 @@ public class DetailActivity
     }
 
     private void loadMovie() {
-
         String keyStringExtra = getString(R.string.name_movie_trans_activity);
         Intent intentOrigin = getIntent();
-        Movie refMovie  = intentOrigin.getExtras().getParcelable(keyStringExtra);
+        this.refMovie  = intentOrigin.getExtras().getParcelable(keyStringExtra);
         boolean isNetworkOk = PopularMoviesCertAcessNetwork.isNetworkAcessOK(this.getApplicationContext());
 
         if (!isNetworkOk) {
             String msgErro = this.getString(R.string.app_erro_network_acess_detail);
             new PopularMoviesMsg().showMessageErro(msgErro, DetailActivity.this);
         } else {
-            new VideoMovieReviewNetworkTask(this.networkConfig,
-                    this.parserData, this.networkRun, this).execute(new Movie[]{refMovie});
+            LoaderCallbacks<Movie> callbacks = DetailActivity.this;
+            getSupportLoaderManager().initLoader(DETAIL_MOVIE, null, callbacks );
         }
 
     }
@@ -156,22 +165,26 @@ public class DetailActivity
         this.actionBarEnabledDisplayHome(actionBar);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_popular_movies_detail_app, menu);
+        this.itemFav = menu.findItem(R.id.menu_item_fav);
+        this.itemAddFav = menu.findItem(R.id.menu_item_add_fav);
+        return true;
+    }
 
     @Override
-    public void onPostFinished(Object detailMovies) {
-        final int POS_INI_X_SCROLL = 0;
-        final int POS_INI_Y_SCROLL = 0;
-        Movie detailMovie = (Movie)detailMovies;
-        RequestCreator requestCreatorObject = detailMovie.getRefRequesImg();
+    public boolean onOptionsItemSelected(MenuItem item) {
+        final int idItem = item.getItemId();
+        final int idFavAction = R.id.menu_item_add_fav;
+        final int idFav = R.id.menu_item_fav;
 
-        this.progressBar.setVisibility(View.INVISIBLE);
-        this.scrollView.setVisibility(View.VISIBLE);
-        this.scrollView.scrollTo(POS_INI_X_SCROLL, POS_INI_Y_SCROLL);
+        if (idItem == idFavAction) {
+            item.setVisible(false);
+            this.itemFav.setVisible(true);
+        }
 
-        this.inputDataScreen(detailMovie);
-        requestCreatorObject.into(this.imageBackDrop);
-
-
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -203,25 +216,32 @@ public class DetailActivity
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_popular_movies_detail_app, menu);
-        this.itemFav = menu.findItem(R.id.menu_item_fav);
-        this.itemAddFav = menu.findItem(R.id.menu_item_add_fav);
-        return true;
+    public Loader<Movie> onCreateLoader(int id, Bundle args) {
+
+        VideoMovieReviewNetworkTask videoMovieReviewNetworkTask =
+                new VideoMovieReviewNetworkTask(DetailActivity.this, this.refMovie,
+                        this.parserData, this.networkRun, this.networkConfig, this);
+
+        return videoMovieReviewNetworkTask;
     }
 
+    @Override
+    public void onLoadFinished(Loader<Movie> loader, Movie data) {
+        final int POS_INI_X_SCROLL = 0;
+        final int POS_INI_Y_SCROLL = 0;
+        Movie detailMovie = data;
+        RequestCreator requestCreatorObject = detailMovie.getRefRequesImg();
+
+        this.progressBar.setVisibility(View.INVISIBLE);
+        this.scrollView.setVisibility(View.VISIBLE);
+        this.scrollView.scrollTo(POS_INI_X_SCROLL, POS_INI_Y_SCROLL);
+
+        this.inputDataScreen(detailMovie);
+        requestCreatorObject.into(this.imageBackDrop);
+        this.progressBar.setVisibility(View.INVISIBLE);
+    }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        final int idItem = item.getItemId();
-        final int idFavAction = R.id.menu_item_add_fav;
-        final int idFav = R.id.menu_item_fav;
-
-        if (idItem == idFavAction) {
-            item.setVisible(false);
-            this.itemFav.setVisible(true);
-        }
-
-        return super.onOptionsItemSelected(item);
+    public void onLoaderReset(Loader<Movie> loader) {
     }
 }
