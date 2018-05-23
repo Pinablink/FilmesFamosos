@@ -3,6 +3,7 @@ package br.com.nanodegree.pinablink;
 
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -30,6 +31,7 @@ import br.com.nanodegree.pinablink.engine.network.task.ActivityFilmesFamosos;
 import br.com.nanodegree.pinablink.engine.network.task.AsyncTaskNetworkDelegator;
 import br.com.nanodegree.pinablink.engine.network.task.VideoMovieReviewNetworkTask;
 import br.com.nanodegree.pinablink.engine.util.PopularMoviesCertAcessNetwork;
+import br.com.nanodegree.pinablink.engine.util.PopularMoviesFormat;
 import br.com.nanodegree.pinablink.engine.util.PopularMoviesMsg;
 
 /**
@@ -51,8 +53,13 @@ public class DetailActivity
     private RecyclerView recycleViewTrailerPresentation;
     private MenuItem itemFav;
     private MenuItem itemAddFav;
-    //private URL urlDetail;
     private Movie refMovie;
+    private String sharedMovieTrailerKey;
+    private final String id_state_itemMenuFav = "strItemMenuFav";
+    private final String id_state_itemMenuAddFav = "strItemMenuAddFav";
+    private final String id_sharedMovie_trailerkey = "strKeyTrailerkey";
+    private boolean checkedMenuFav;
+    private boolean checkedMenuAddFav;
 
     protected void loadUrl () {
     }
@@ -68,6 +75,8 @@ public class DetailActivity
         this.scrollView = (ScrollView) findViewById(R.id.scrollViewDetail);
         this.recycleViewReviewPresentation = (RecyclerView) findViewById(R.id.recyclerview_review_movie);
         this.recycleViewTrailerPresentation = (RecyclerView) findViewById(R.id.recyclerview_trailer_movie);
+        this.checkedMenuAddFav = true;
+        this.checkedMenuFav = false;
     }
 
     private void loadMovie() {
@@ -139,7 +148,8 @@ public class DetailActivity
         DetailVideoReviewMovie detailVideoReviewMovie =
                 refMovie.getDetailVideoReviewMovie();
 
-
+        MovieTrailer movieTrailer = detailVideoReviewMovie.getListMovieTrailer().get(0);
+        this.sharedMovieTrailerKey = movieTrailer.getKey();
         this.inputReview(detailVideoReviewMovie);
         this.inputTrailer(detailVideoReviewMovie);
     }
@@ -170,6 +180,9 @@ public class DetailActivity
         getMenuInflater().inflate(R.menu.menu_popular_movies_detail_app, menu);
         this.itemFav = menu.findItem(R.id.menu_item_fav);
         this.itemAddFav = menu.findItem(R.id.menu_item_add_fav);
+        this.itemFav.setVisible(this.checkedMenuFav);
+        this.itemAddFav.setVisible(this.checkedMenuAddFav);
+
         return true;
     }
 
@@ -178,10 +191,23 @@ public class DetailActivity
         final int idItem = item.getItemId();
         final int idFavAction = R.id.menu_item_add_fav;
         final int idFav = R.id.menu_item_fav;
+        final int idShare = R.id.menu_item_share;
 
         if (idItem == idFavAction) {
             item.setVisible(false);
             this.itemFav.setVisible(true);
+        } else if (idItem == idFav) {
+            item.setVisible(false);
+            this.itemAddFav.setVisible(true);
+        } else if (idItem == idShare) {
+            Uri uriSharedMovieTrailerYoutube = PopularMoviesFormat.requestHtmlYoutubeVideo(this.getApplicationContext(),
+                    this.sharedMovieTrailerKey);
+            String strPathTrailerYoutube = uriSharedMovieTrailerYoutube.toString();
+            Intent intentShared = new Intent();
+            intentShared.setAction(Intent.ACTION_SEND);
+            intentShared.putExtra(Intent.EXTRA_TEXT, strPathTrailerYoutube);
+            intentShared.setType("text/plain");
+            this.startActivity(intentShared);
         }
 
         return super.onOptionsItemSelected(item);
@@ -243,5 +269,28 @@ public class DetailActivity
 
     @Override
     public void onLoaderReset(Loader<Movie> loader) {
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(this.id_state_itemMenuFav, this.itemFav.isVisible());
+        outState.putBoolean(this.id_state_itemMenuAddFav, this.itemAddFav.isVisible());
+        outState.putString(this.id_sharedMovie_trailerkey, this.sharedMovieTrailerKey);
+
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        boolean containsControlMenu =
+                (savedInstanceState.containsKey(this.id_state_itemMenuFav) &&
+                savedInstanceState.containsKey(this.id_state_itemMenuAddFav));
+
+        if (containsControlMenu) {
+            this.checkedMenuFav = savedInstanceState.getBoolean(this.id_state_itemMenuFav);
+            this.checkedMenuAddFav = savedInstanceState.getBoolean(this.id_state_itemMenuAddFav);
+        }
+
     }
 }
