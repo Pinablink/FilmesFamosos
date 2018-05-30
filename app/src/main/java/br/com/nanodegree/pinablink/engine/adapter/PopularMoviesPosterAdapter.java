@@ -11,24 +11,29 @@ import br.com.nanodegree.pinablink.R;
 import java.util.List;
 import br.com.nanodegree.pinablink.dataObject.Movie;
 import br.com.nanodegree.pinablink.engine.holder.PopularMoviesPosterAdapterViewHolder;
-import br.com.nanodegree.pinablink.engine.listener.PopularMoviesPosScrollOnClick;
 import br.com.nanodegree.pinablink.engine.listener.PopularMoviesPosterOnClick;
+import br.com.nanodegree.pinablink.engine.listener.popularMoviesInterface.PopularMoviesConvertImageBase64On;
+import br.com.nanodegree.pinablink.engine.util.PopularMoviesBase64ImageExtractor;
 
 /**
  * Created by Pinablink on 16/04/2018.
  */
-public class PopularMoviesPosterAdapter extends RecyclerView.Adapter<PopularMoviesPosterAdapterViewHolder> {
+public class PopularMoviesPosterAdapter
+        extends RecyclerView.Adapter<PopularMoviesPosterAdapterViewHolder>
+        implements PopularMoviesConvertImageBase64On {
 
     private List<Movie> refListMovie;
     private Context refContext;
 
-    private PopularMoviesPosScrollOnClick refPopularMoviesPosScrollOnClick;
 
-    public PopularMoviesPosterAdapter(List<Movie> pRefListMovie,
-                                      PopularMoviesPosScrollOnClick pPopularMoviesPosScrollOnClick) {
+
+    public PopularMoviesPosterAdapter() {
         super();
+
+    }
+
+    public void setListMovie (List<Movie> pRefListMovie) {
         this.refListMovie = pRefListMovie;
-        this.refPopularMoviesPosScrollOnClick = pPopularMoviesPosScrollOnClick;
     }
 
     @Override
@@ -44,11 +49,15 @@ public class PopularMoviesPosterAdapter extends RecyclerView.Adapter<PopularMovi
     public void onBindViewHolder(PopularMoviesPosterAdapterViewHolder holder, int position) {
         ImageView imageView = holder.getImageView();
         Movie movie = refListMovie.get(position);
-        PopularMoviesPosterOnClick popularMoviesEvent = new PopularMoviesPosterOnClick(movie, this.refContext,
-                this.refPopularMoviesPosScrollOnClick);
+        PopularMoviesPosterOnClick popularMoviesEvent = new PopularMoviesPosterOnClick(movie, this.refContext);
 
         imageView.setOnClickListener(popularMoviesEvent);
         RequestCreator requestCreator = movie.getRefRequesImg();
+        PopularMoviesBase64ImageExtractor popularMoviesBitmapExtractor =
+                new PopularMoviesBase64ImageExtractor(movie, this);
+        //Transformar a Imagem obtida em Base64 para transporte e persistencia em base
+        new Thread(popularMoviesBitmapExtractor).start();
+        //
         requestCreator.into(holder.getImageView());
     }
 
@@ -56,5 +65,10 @@ public class PopularMoviesPosterAdapter extends RecyclerView.Adapter<PopularMovi
     @Override
     public int getItemCount() {
         return refListMovie != null ? refListMovie.size() : 0;
+    }
+
+    @Override
+    public void onConvertImageBase64(Movie movie, String strImageBase64) {
+        movie.setPosterImageBase64(strImageBase64);
     }
 }

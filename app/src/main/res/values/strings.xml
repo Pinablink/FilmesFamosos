@@ -7,10 +7,11 @@
     <string name="cfg_app_path_url_video1">http://api.themoviedb.org/3/movie/</string>
     <string name="cfg_app_path_url_video2">/videos</string>
     <string name="cfg_app_api_key">api_key</string>
-    <string name="cfg_app_api_key_value">ADICIONAR AQUI A CHAVE DA API</string>
+    <string name="cfg_app_api_key_value">INSIRA AQUI A CHAVE DE API</string>
     <string name="cfg_app_call_youtube_app">vnd.youtube://</string>
     <string name="cfg_app_call_youtube_webbrowser">http://www.youtube.com/watch</string>
     <string name="cfg_app_param_name_key">v</string>
+    <string name="cfg_state_fav">stateMovie</string>
     <!-- Fim da área de configuração -->
     <!-- String titulo de comandos -->
     <string name="menu_label_popular_movies">Buscar Mais Populares</string>
@@ -31,8 +32,13 @@
     <string name="title_trailer_movie">Trailer:</string>
     <string name="title_review_movies">Resenhas:</string>
     <string name="msg_empty_review">Não existe(m) resenha(s) até o momento</string>
+    <string name="msg_fav_empty">Não existe nenhum cadastro de filme favorito"</string>
+    <string name="msg_trailer_empty">Não existe nenhum trailer para esse filme</string>
+    <string name="msg_shared_trailer_empty">Para essa ação é necessário a existência de pelo menos um Trailer.</string>
     <string name="app_name">Filmes Famosos</string>
     <string name="app_erro_network_acess">Seu dispositivo não está conectado a WEB. Este Aplicativo consome recursos da WEB. Conecte e tente novamente</string>
     <string name="app_erro_network_acess_detail">Seu dispositivo não está conectado a WEB. Esta tela, carrega imagens de um servidor remoto. Portanto é necessário que exista uma conexão para que todos os dados sejam exibidos.</string>
     <string name="app_json_not_exists">Ocorreu um problema na obtenção dos dados referentes aos filmes. Seu dispositivo pode estar desconectado da internet, ou esta ocorrendo instabilidade no servidor de dados. Verifique a conexão ou tente mais tarde.</string>
+    <string name="app_add_favorite">Adicionado ao Favoritos</string>
+    <string name="app_remove_favorite">Removido do Favoritos</string>
 </resources>

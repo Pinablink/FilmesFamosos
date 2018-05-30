@@ -1,5 +1,6 @@
 package br.com.nanodegree.pinablink.dataObject;
 
+
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.squareup.picasso.RequestCreator;
@@ -12,7 +13,7 @@ import br.com.nanodegree.pinablink.engine.annotation.ParamInJson;
 public final class Movie implements Parcelable {
 
     private String voteCount;
-    private String id;
+    private long id;
     private boolean video;
     private String voteAverage;
     private String title;
@@ -26,6 +27,8 @@ public final class Movie implements Parcelable {
     private String releaseDate;
     private RequestCreator refRequesImg;
     private DetailVideoReviewMovie detailVideoReviewMovie;
+    private String posterImageBase64;
+    private String backDropImageBase64;
 
     /**
      *
@@ -48,7 +51,7 @@ public final class Movie implements Parcelable {
 
     protected Movie(Parcel in) {
         voteCount = in.readString();
-        id = in.readString();
+        id = in.readLong();
         video = in.readByte() != 0;
         voteAverage = in.readString();
         title = in.readString();
@@ -60,6 +63,8 @@ public final class Movie implements Parcelable {
         adult = in.readByte() != 0;
         overview = in.readString();
         releaseDate = in.readString();
+        posterImageBase64 = in.readString();
+        backDropImageBase64 =  in.readString();
     }
 
     public String getVoteCount() {
@@ -71,12 +76,12 @@ public final class Movie implements Parcelable {
         this.voteCount = voteCount;
     }
 
-    public String getId() {
+    public long getId() {
         return id;
     }
 
-    @ParamInJson(name = "id")
-    public void setId(String id) {
+    @ParamInJson(name = "id", valueType = Param.VALUE_TYPE_LONG)
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -187,16 +192,6 @@ public final class Movie implements Parcelable {
         this.refRequesImg = refRequesImg;
     }
 
-    /**
-     * Describe the kinds of special objects contained in this Parcelable
-     * instance's marshaled representation. For example, if the object will
-     * include a file descriptor in the output of {@link #writeToParcel(Parcel, int)},
-     * the return value of this method must include the
-     * {@link #CONTENTS_FILE_DESCRIPTOR} bit.
-     *
-     * @return a bitmask indicating the set of special object types marshaled
-     * by this Parcelable object instance.
-     */
     @Override
     public int describeContents() {
         return 0;
@@ -210,19 +205,11 @@ public final class Movie implements Parcelable {
         this.detailVideoReviewMovie = detailVideoReviewMovie;
     }
 
-    /**
-     * Flatten this object in to a Parcel.
-     *
-     * @param dest  The Parcel in which the object should be written.
-     * @param flags Additional flags about how the object should be written.
-     *              May be 0 or {@link #PARCELABLE_WRITE_RETURN_VALUE}.
-     */
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(voteCount);
-        dest.writeString(id);
+        dest.writeLong(id);
         dest.writeByte((byte) (video ? 1 : 0));
-
         dest.writeString(voteAverage);
         dest.writeString(title);
         dest.writeString(popularity);
@@ -233,5 +220,24 @@ public final class Movie implements Parcelable {
         dest.writeByte((byte) (adult ? 1 : 0));
         dest.writeString(overview);
         dest.writeString(releaseDate);
+        dest.writeString(posterImageBase64);
+        dest.writeString(backDropImageBase64);
     }
+
+    public String getPosterImageBase64() {
+        return posterImageBase64;
+    }
+
+    public void setPosterImageBase64(String posterImageBase64) {
+        this.posterImageBase64 = posterImageBase64;
+    }
+
+    public String getBackDropImageBase64() {
+        return backDropImageBase64;
+    }
+
+    public void setBackDropImageBase64(String backDropImageBase64) {
+        this.backDropImageBase64 = backDropImageBase64;
+    }
+
 }

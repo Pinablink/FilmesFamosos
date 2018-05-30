@@ -29,6 +29,7 @@ public class PopularMoviesNetworkTask
         this.activityRefer = pMainActivity;
         this.parserData = pFormatData;
         this.networkRun = pNetworkRun;
+
     }
 
     @Override
@@ -52,7 +53,13 @@ public class PopularMoviesNetworkTask
     @Override
     protected void onStartLoading() {
         this.activityRefer.onInitProgressBar();
-        this.forceLoad();
+
+        if (this.popularMoviesRef != null) {
+            this.deliverResult(this.popularMoviesRef);
+        } else {
+            this.forceLoad();
+        }
+
     }
 
     private void searchImages(PopularMovies pPopularMovies) {

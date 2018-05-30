@@ -2,7 +2,6 @@ package br.com.nanodegree.pinablink.engine.util;
 
 import android.content.Context;
 import android.net.Uri;
-
 import br.com.nanodegree.pinablink.R;
 
 /**

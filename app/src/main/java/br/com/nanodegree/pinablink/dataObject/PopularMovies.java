@@ -1,10 +1,7 @@
 package br.com.nanodegree.pinablink.dataObject;
 
 
-import android.os.Parcelable;
-
 import java.util.List;
-
 import br.com.nanodegree.pinablink.engine.annotation.Param;
 import br.com.nanodegree.pinablink.engine.annotation.ParamInJson;
 

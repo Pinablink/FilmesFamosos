@@ -5,10 +5,7 @@ package br.com.nanodegree.pinablink.engine.util;
  */
 public enum TypeVideoView {
     NONE(""),
-    TRAILER("Trailer"),
-    CLIP("Clip"),
-    TEASER("Teaser"),
-    FEATURETTE("Featurette");
+    TRAILER("Trailer");
 
     public String value;
 

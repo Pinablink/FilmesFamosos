@@ -10,24 +10,13 @@ import br.com.nanodegree.pinablink.R;
  */
 public class PopularMoviesPosterAdapterViewHolder extends RecyclerView.ViewHolder {
 
-    /**
-     *
-     */
     private ImageView imageViewPoster;
 
-    /**
-     *
-     * @param itemView
-     */
     public PopularMoviesPosterAdapterViewHolder(View itemView) {
         super(itemView);
         this.imageViewPoster = (ImageView) itemView.findViewById(R.id.poster_image);
     }
 
-    /**
-     *
-     * @return
-     */
     public ImageView getImageView () {
         return  this.imageViewPoster;
     }

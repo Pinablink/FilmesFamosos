@@ -1,7 +1,6 @@
 package br.com.nanodegree.pinablink;
 
-
-
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.ActionBar;
@@ -27,9 +26,13 @@ import br.com.nanodegree.pinablink.dataObject.MovieTrailer;
 import br.com.nanodegree.pinablink.dataObject.Review;
 import br.com.nanodegree.pinablink.engine.adapter.PopularMoviesReviewAdapter;
 import br.com.nanodegree.pinablink.engine.adapter.PopularMoviesTrailerAdapter;
+import br.com.nanodegree.pinablink.engine.listener.popularMoviesInterface.PopularMoviesConvertImageBase64On;
 import br.com.nanodegree.pinablink.engine.network.task.ActivityFilmesFamosos;
 import br.com.nanodegree.pinablink.engine.network.task.AsyncTaskNetworkDelegator;
 import br.com.nanodegree.pinablink.engine.network.task.VideoMovieReviewNetworkTask;
+import br.com.nanodegree.pinablink.engine.persistence.PopularMoviesAddRemoveFav;
+import br.com.nanodegree.pinablink.engine.persistence.PopularMoviesStateFav;
+import br.com.nanodegree.pinablink.engine.util.PopularMoviesBase64ImageExtractor;
 import br.com.nanodegree.pinablink.engine.util.PopularMoviesCertAcessNetwork;
 import br.com.nanodegree.pinablink.engine.util.PopularMoviesFormat;
 import br.com.nanodegree.pinablink.engine.util.PopularMoviesMsg;
@@ -39,13 +42,15 @@ import br.com.nanodegree.pinablink.engine.util.PopularMoviesMsg;
  */
 public class DetailActivity
         extends ActivityFilmesFamosos
-        implements AsyncTaskNetworkDelegator, LoaderCallbacks<Movie> {
+        implements AsyncTaskNetworkDelegator, LoaderCallbacks<Movie>,
+        PopularMoviesConvertImageBase64On {
 
     private TextView textTitle;
     private TextView textSinopse;
     private TextView textVoteAverage;
     private TextView textReleaseDate;
     private TextView textEmptyMsg;
+    private TextView textTrailerEmpty;
     private ImageView imageBackDrop;
     private ProgressBar progressBar;
     private ScrollView scrollView;
@@ -58,6 +63,7 @@ public class DetailActivity
     private final String id_state_itemMenuFav = "strItemMenuFav";
     private final String id_state_itemMenuAddFav = "strItemMenuAddFav";
     private final String id_sharedMovie_trailerkey = "strKeyTrailerkey";
+    private final String STATE_REF_MOVIE = "MOVIE_CURRENT";
     private boolean checkedMenuFav;
     private boolean checkedMenuAddFav;
 
@@ -75,24 +81,43 @@ public class DetailActivity
         this.scrollView = (ScrollView) findViewById(R.id.scrollViewDetail);
         this.recycleViewReviewPresentation = (RecyclerView) findViewById(R.id.recyclerview_review_movie);
         this.recycleViewTrailerPresentation = (RecyclerView) findViewById(R.id.recyclerview_trailer_movie);
+        this.textTrailerEmpty = (TextView) (TextView) findViewById(R.id.traileremptyReviewMsg);
         this.checkedMenuAddFav = true;
         this.checkedMenuFav = false;
     }
 
     private void loadMovie() {
         String keyStringExtra = getString(R.string.name_movie_trans_activity);
-        Intent intentOrigin = getIntent();
-        this.refMovie  = intentOrigin.getExtras().getParcelable(keyStringExtra);
+
+        if (this.refMovie == null) {
+            Intent intentOrigin = getIntent();
+            this.refMovie  = intentOrigin.getExtras().getParcelable(keyStringExtra);
+        }
+
         boolean isNetworkOk = PopularMoviesCertAcessNetwork.isNetworkAcessOK(this.getApplicationContext());
 
         if (!isNetworkOk) {
             String msgErro = this.getString(R.string.app_erro_network_acess_detail);
             new PopularMoviesMsg().showMessageErro(msgErro, DetailActivity.this);
         } else {
+
             LoaderCallbacks<Movie> callbacks = DetailActivity.this;
-            getSupportLoaderManager().initLoader(DETAIL_MOVIE, null, callbacks );
+            getSupportLoaderManager().initLoader(DETAIL_MOVIE, null, callbacks);
+
+            boolean isFav = PopularMoviesStateFav.isFav(this.getApplicationContext(), this.refMovie);
+
+            if (isFav){
+                this.checkedMenuFav = true;
+                this.checkedMenuAddFav = false;
+            }
         }
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        this.loadMovie();
     }
 
     private void inputReview (DetailVideoReviewMovie refDetailVideoReviewMovie) {
@@ -120,6 +145,7 @@ public class DetailActivity
 
     private void inputTrailer (DetailVideoReviewMovie refDetailVideoReviewMovie) {
         if (refDetailVideoReviewMovie.isExistListTrailerMovie()) {
+            this.textTrailerEmpty.setVisibility(View.INVISIBLE);
             List<MovieTrailer> movieTrailerList = refDetailVideoReviewMovie.getListMovieTrailer();
             PopularMoviesTrailerAdapter adapter = new PopularMoviesTrailerAdapter(movieTrailerList);
 
@@ -129,8 +155,9 @@ public class DetailActivity
             this.recycleViewTrailerPresentation.setLayoutManager(linearLayoutManager);
             this.recycleViewTrailerPresentation.setAdapter(adapter);
             this.recycleViewTrailerPresentation.setVisibility(View.VISIBLE);
+
         } else {
-            //
+            this.textTrailerEmpty.setVisibility(View.VISIBLE);
         }
     }
 
@@ -148,8 +175,15 @@ public class DetailActivity
         DetailVideoReviewMovie detailVideoReviewMovie =
                 refMovie.getDetailVideoReviewMovie();
 
-        MovieTrailer movieTrailer = detailVideoReviewMovie.getListMovieTrailer().get(0);
-        this.sharedMovieTrailerKey = movieTrailer.getKey();
+        boolean existsMovieTrailer = (detailVideoReviewMovie.getListMovieTrailer().size() > 0);
+
+        if (existsMovieTrailer) {
+            MovieTrailer movieTrailer = detailVideoReviewMovie.getListMovieTrailer().get(0);
+            this.sharedMovieTrailerKey = movieTrailer.getKey();
+        } else {
+            this.sharedMovieTrailerKey = "";
+        }
+
         this.inputReview(detailVideoReviewMovie);
         this.inputTrailer(detailVideoReviewMovie);
     }
@@ -171,7 +205,6 @@ public class DetailActivity
         ActionBar actionBar = getSupportActionBar();
         this.initResource();
         this.initResourceScreen();
-        this.loadMovie();
         this.actionBarEnabledDisplayHome(actionBar);
     }
 
@@ -192,22 +225,45 @@ public class DetailActivity
         final int idFavAction = R.id.menu_item_add_fav;
         final int idFav = R.id.menu_item_fav;
         final int idShare = R.id.menu_item_share;
+        Context context = this.getApplicationContext();
 
         if (idItem == idFavAction) {
+            String msg = context.getString(R.string.app_add_favorite);
             item.setVisible(false);
             this.itemFav.setVisible(true);
+            //QUANDO ADICIONAR AO FAVORITOS
+            PopularMoviesStateFav.setFav(context, this.refMovie);
+            PopularMoviesAddRemoveFav popularMoviesAddFav =
+                    new PopularMoviesAddRemoveFav(this.refMovie, context);
+            popularMoviesAddFav.insert();
+             new PopularMoviesMsg().showToastMsgInfo(msg, context);
+            //
         } else if (idItem == idFav) {
+            String msg = context.getString(R.string.app_remove_favorite);
             item.setVisible(false);
             this.itemAddFav.setVisible(true);
+            //QUANDO RETIRAR DO FAVORITOS
+            PopularMoviesStateFav.removeFav(context, this.refMovie);
+            PopularMoviesAddRemoveFav popularMoviesRemoveFav =
+                    new PopularMoviesAddRemoveFav(this.refMovie, context);
+            popularMoviesRemoveFav.remove();
+            new PopularMoviesMsg().showToastMsgInfo(msg, context);
+            //
         } else if (idItem == idShare) {
-            Uri uriSharedMovieTrailerYoutube = PopularMoviesFormat.requestHtmlYoutubeVideo(this.getApplicationContext(),
-                    this.sharedMovieTrailerKey);
-            String strPathTrailerYoutube = uriSharedMovieTrailerYoutube.toString();
-            Intent intentShared = new Intent();
-            intentShared.setAction(Intent.ACTION_SEND);
-            intentShared.putExtra(Intent.EXTRA_TEXT, strPathTrailerYoutube);
-            intentShared.setType("text/plain");
-            this.startActivity(intentShared);
+            if (this.sharedMovieTrailerKey != null &&
+                    this.sharedMovieTrailerKey.trim().length() > 0) {
+                Uri uriSharedMovieTrailerYoutube = PopularMoviesFormat.requestHtmlYoutubeVideo(this.getApplicationContext(),
+                        this.sharedMovieTrailerKey);
+                String strPathTrailerYoutube = uriSharedMovieTrailerYoutube.toString();
+                Intent intentShared = new Intent();
+                intentShared.setAction(Intent.ACTION_SEND);
+                intentShared.putExtra(Intent.EXTRA_TEXT, strPathTrailerYoutube);
+                intentShared.setType("text/plain");
+                this.startActivity(intentShared);
+            } else {
+                String msg = context.getString(R.string.msg_shared_trailer_empty);
+                new PopularMoviesMsg().showMessageErro(msg, DetailActivity.this);
+            }
         }
 
         return super.onOptionsItemSelected(item);
@@ -220,6 +276,13 @@ public class DetailActivity
 
         RequestCreator refRequestImg = Picasso.with(this.getApplicationContext()).load(strBackDropImage);
         movie.setRefRequesImg(refRequestImg);
+
+        PopularMoviesBase64ImageExtractor popularMoviesBitmapExtractor =
+                new PopularMoviesBase64ImageExtractor(movie, this);
+
+        //Transformar a Imagem obtida em Base64 para persistencia em base
+        new Thread(popularMoviesBitmapExtractor).start();
+        //
 
         DetailVideoReviewMovie detailMovie = movie.getDetailVideoReviewMovie();
         List<MovieTrailer> listMovieTrailer =  detailMovie.getListMovieTrailer();
@@ -277,7 +340,7 @@ public class DetailActivity
         outState.putBoolean(this.id_state_itemMenuFav, this.itemFav.isVisible());
         outState.putBoolean(this.id_state_itemMenuAddFav, this.itemAddFav.isVisible());
         outState.putString(this.id_sharedMovie_trailerkey, this.sharedMovieTrailerKey);
-
+        outState.putParcelable(STATE_REF_MOVIE, this.refMovie);
     }
 
     @Override
@@ -292,5 +355,11 @@ public class DetailActivity
             this.checkedMenuAddFav = savedInstanceState.getBoolean(this.id_state_itemMenuAddFav);
         }
 
+        this.refMovie = savedInstanceState.getParcelable(STATE_REF_MOVIE);
+    }
+
+    @Override
+    public void onConvertImageBase64(Movie movie, String strImageBase64) {
+        movie.setBackDropImageBase64(strImageBase64);
     }
 }

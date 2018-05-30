@@ -28,12 +28,23 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <activity android:name=".FavoriteActivity"
+        <activity
+            android:name=".FavoriteActivity"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+        <activity android:name=".DetailFavActivity"
+            android:parentActivityName=".FavoriteActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".FavoriteActivity" />
+        </activity>
+        <provider
+            android:authorities="br.com.nanodegree.pinablink"
+            android:name="br.com.nanodegree.pinablink.dataProvider.PopularMoviesContentProvider"
+            android:exported="false"/>
     </application>
 
 </manifest>

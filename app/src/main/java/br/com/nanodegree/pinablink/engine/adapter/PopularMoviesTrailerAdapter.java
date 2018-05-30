@@ -6,9 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-
 import com.squareup.picasso.RequestCreator;
-
 import java.util.List;
 import br.com.nanodegree.pinablink.R;
 import br.com.nanodegree.pinablink.dataObject.MovieTrailer;

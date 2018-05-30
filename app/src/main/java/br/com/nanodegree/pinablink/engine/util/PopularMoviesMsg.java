@@ -2,7 +2,7 @@ package br.com.nanodegree.pinablink.engine.util;
 
 import android.content.Context;
 import android.support.v7.app.AlertDialog;
-
+import android.widget.Toast;
 import br.com.nanodegree.pinablink.R;
 
 /**
@@ -10,22 +10,12 @@ import br.com.nanodegree.pinablink.R;
  */
 public class PopularMoviesMsg {
 
-    /**
-     *
-     */
     private String msg;
 
-    /**
-     *
-     */
     public PopularMoviesMsg() {
         super();
     }
 
-    /**
-     * @param msg
-     * @param context
-     */
     public void showMessageErro(String msg, Context context) {
         AlertDialog.Builder alert = new AlertDialog.Builder(context);
         String title = context.getString(R.string.title_msg_erro);
@@ -33,4 +23,11 @@ public class PopularMoviesMsg {
         AlertDialog alertDialog = alert.create();
         alertDialog.show();
     }
+
+    public void showToastMsgInfo (String msg, Context context) {
+        final int DURATION = Toast.LENGTH_SHORT;
+        Toast.makeText(context, msg, DURATION).show();
+    }
+
+
 }

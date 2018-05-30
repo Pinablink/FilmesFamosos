@@ -5,14 +5,14 @@
     android:background="@color/colorActivity"
     android:padding="10dp">
 
-    <ProgressBar android:id="@+id/dProgress"
+    <ProgressBar android:id="@+id/dfavProgress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="invisible"
         android:layout_gravity="center"/>
 
     <ScrollView
-        android:id="@+id/scrollViewDetail"
+        android:id="@+id/dfavscrollViewDetail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="invisible">
@@ -25,7 +25,7 @@
             android:padding="10dp">
 
             <TextView
-                android:id="@+id/mTitle"
+                android:id="@+id/dfavMTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text=""
@@ -33,7 +33,7 @@
                 android:textSize="20sp" />
 
             <ImageView
-                android:id="@+id/backDrop_image"
+                android:id="@+id/dfavBackDrop_image"
                 android:layout_width="280dp"
                 android:layout_height="180dp"
                 android:layout_gravity="center" />
@@ -53,7 +53,7 @@
                     android:textStyle="bold"/>
 
                 <TextView
-                    android:id="@+id/mSinopse"
+                    android:id="@+id/dfavMSinopse"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="10dp"
@@ -68,7 +68,7 @@
                     android:textStyle="bold"/>
 
                 <TextView
-                    android:id="@+id/mVoteAverage"
+                    android:id="@+id/dfavMVoteAverage"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="5dp"
@@ -84,57 +84,12 @@
                     android:textStyle="bold"/>
 
                 <TextView
-                    android:id="@+id/mReleaseDate"
+                    android:id="@+id/dfavMReleaseDate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="2dp"
                     android:text=""
                     android:textColor="@color/colorTextDetail" />
-
-                <TextView android:id="@+id/titleTrailer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="8dp"
-                    android:paddingBottom="1dp"
-                    android:text="@string/title_trailer_movie"
-                    android:textColor="@color/colorTextDetail"
-                    android:textStyle="bold"/>
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/recyclerview_trailer_movie"
-                    android:layout_height="wrap_content"
-                    android:layout_width="match_parent"
-                    android:visibility="invisible"/>
-
-                <TextView android:id="@+id/traileremptyReviewMsg"
-                    android:layout_height="wrap_content"
-                    android:layout_width="match_parent"
-                    android:visibility="invisible"
-                    android:padding="2dp"
-                    android:text="@string/msg_trailer_empty"
-                    android:textColor="@color/colorTextDetail"/>
-
-                <TextView android:id="@+id/titleReview_"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="3dp"
-                    android:text="@string/title_review_movies"
-                    android:textColor="@color/colorTextDetail"
-                    android:textStyle="bold"/>
-
-                <TextView android:id="@+id/emptyReviewMsg"
-                    android:layout_height="wrap_content"
-                    android:layout_width="match_parent"
-                    android:visibility="invisible"
-                    android:padding="2dp"
-                    android:text="@string/msg_empty_review"
-                    android:textColor="@color/colorTextDetail"/>
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/recyclerview_review_movie"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:visibility="invisible"/>
 
             </LinearLayout>
 

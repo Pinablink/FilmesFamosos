@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.view.View;
-
 import br.com.nanodegree.pinablink.R;
 import br.com.nanodegree.pinablink.dataObject.MovieTrailer;
 import br.com.nanodegree.pinablink.engine.util.PopularMoviesFormat;

@@ -2,7 +2,6 @@ package br.com.nanodegree.pinablink;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
@@ -19,7 +18,6 @@ import java.util.List;
 import br.com.nanodegree.pinablink.dataObject.Movie;
 import br.com.nanodegree.pinablink.dataObject.PopularMovies;
 import br.com.nanodegree.pinablink.engine.adapter.PopularMoviesPosterAdapter;
-import br.com.nanodegree.pinablink.engine.listener.PopularMoviesPosScrollOnClick;
 import br.com.nanodegree.pinablink.engine.network.task.ActivityFilmesFamosos;
 import br.com.nanodegree.pinablink.engine.network.task.AsyncTaskNetworkDelegator;
 import br.com.nanodegree.pinablink.engine.network.task.PopularMoviesNetworkTask;
@@ -28,16 +26,23 @@ import br.com.nanodegree.pinablink.engine.util.PopularMoviesMsg;
 
 public class MainActivity extends ActivityFilmesFamosos
         implements AsyncTaskNetworkDelegator,
-        LoaderCallbacks<PopularMovies>, PopularMoviesPosScrollOnClick {
+        LoaderCallbacks<PopularMovies>{
 
     private RecyclerView recycleViewPosterPresentation;
     private ProgressBar progressProcess;
     private static int LOADER_POPULAR_MOVIES = 0;
-    private static int LOADER_TOP_RATED_MOVIES;
+    private static int LOADER_TOP_RATED_MOVIES = 1;
     private URL urlPopularMovies;
     private URL urlTopRated;
     private String strTitle;
-    private Parcelable parcelable;
+    private boolean dataLoaded;
+    private static final String KEY_DATA_LOADED = "keyDataLoaded";
+    private GridLayoutManager gridLayoutManagerMovies;
+    private PopularMoviesPosterAdapter popularMoviesPosterAdapter;
+    private static final int TYPE_DEFAULT = -1;
+    private static final int TYPE_POPULAR_MOVIES_VIEW = 0;
+    private static final int TYPE_TOP_MOVIES_VIEW = 1;
+    private int typeView = TYPE_DEFAULT;
 
     protected void loadUrl () {
         this.urlPopularMovies = this.networkConfig.getURLPopularMovies();
@@ -53,24 +58,8 @@ public class MainActivity extends ActivityFilmesFamosos
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        initResourceScreen();
-        initResource();
-        loadUrl();
-        boolean isNetworkOk = PopularMoviesCertAcessNetwork.isNetworkAcessOK(this.getApplicationContext());
-        LoaderCallbacks<PopularMovies> callBack = MainActivity.this;
-
-        //Carga Inicial
-        if (isNetworkOk) {
-            Bundle bundle = new Bundle ();
-            bundle.putInt(ID_BUNDLE_URL_PARAM, POPULAR_MOVIES);
-            getSupportLoaderManager().initLoader(MainActivity.LOADER_POPULAR_MOVIES, bundle, callBack);
-            this.strTitle = this.getString(R.string.title_activity_main_default);
-            setTitle(this.strTitle);
-        } else {
-            String msgErro = this.getString(R.string.app_erro_network_acess);
-            new PopularMoviesMsg().showMessageErro(msgErro, MainActivity.this);
-        }
-
+        this.gridLayoutManagerMovies  = new GridLayoutManager(MainActivity.this, 2);
+        this.popularMoviesPosterAdapter = new PopularMoviesPosterAdapter();
     }
 
     @Override
@@ -85,31 +74,42 @@ public class MainActivity extends ActivityFilmesFamosos
         int itemSelected = item.getItemId();
         boolean isNetworkOk = PopularMoviesCertAcessNetwork.isNetworkAcessOK(this.getApplicationContext());
 
-        if (isNetworkOk) {
-            LoaderCallbacks<PopularMovies> callBack = MainActivity.this;
+        //if (isNetworkOk) {
+        LoaderCallbacks<PopularMovies> callBack = MainActivity.this;
 
-            if (itemSelected == R.id.menu_item_popularMovies) {
-                Bundle bundle = new Bundle ();
+        if (itemSelected == R.id.menu_item_popularMovies) {
+            if (isNetworkOk) {
+                this.typeView = TYPE_POPULAR_MOVIES_VIEW;
+                Bundle bundle = new Bundle();
                 bundle.putInt(ID_BUNDLE_URL_PARAM, POPULAR_MOVIES);
                 getSupportLoaderManager().restartLoader(MainActivity.LOADER_POPULAR_MOVIES, bundle, callBack);
                 this.strTitle = this.getString(R.string.title_activity_main_default);
-                this.setTitle(this.strTitle );
+                this.setTitle(this.strTitle);
                 return true;
-            } else if (itemSelected == R.id.menu_item_topRated) {
-                Bundle bundle = new Bundle ();
+            } else {
+                this.progressProcess.setVisibility(View.INVISIBLE);
+                String msgErro = this.getString(R.string.app_erro_network_acess);
+                new PopularMoviesMsg().showMessageErro(msgErro, MainActivity.this);
+                this.progressProcess.setVisibility(View.INVISIBLE);
+            }
+        } else if (itemSelected == R.id.menu_item_topRated) {
+            if (isNetworkOk) {
+                this.typeView = TYPE_TOP_MOVIES_VIEW;
+                Bundle bundle = new Bundle();
                 bundle.putInt(ID_BUNDLE_URL_PARAM, TOP_RATED_MOVIES);
                 getSupportLoaderManager().restartLoader(MainActivity.LOADER_TOP_RATED_MOVIES, bundle, callBack);
                 this.strTitle = this.getString(R.string.title_activity_main_top_rated);
                 this.setTitle(this.strTitle);
                 return true;
-            } else if (itemSelected == R.id.menu_item_myFavorites) {
-                Intent intentFavorite = new Intent(MainActivity.this, FavoriteActivity.class);
-                this.startActivity(intentFavorite);
+            } else {
+                this.progressProcess.setVisibility(View.INVISIBLE);
+                String msgErro = this.getString(R.string.app_erro_network_acess);
+                new PopularMoviesMsg().showMessageErro(msgErro, MainActivity.this);
+                this.progressProcess.setVisibility(View.INVISIBLE);
             }
-
-        } else {
-            String msgErro = this.getString(R.string.app_erro_network_acess);
-            new PopularMoviesMsg().showMessageErro(msgErro, MainActivity.this);
+        } else if (itemSelected == R.id.menu_item_myFavorites) {
+            Intent intentFavorite = new Intent(MainActivity.this, FavoriteActivity.class);
+            this.startActivity(intentFavorite);
         }
 
         return super.onOptionsItemSelected(item);
@@ -153,11 +153,11 @@ public class MainActivity extends ActivityFilmesFamosos
         } else {
             PopularMovies popMovies = (PopularMovies)data;
             List<Movie> refListMovies = popMovies.getListMovie();
-            PopularMoviesPosterAdapter popularMoviesPosterAdapter = new PopularMoviesPosterAdapter(refListMovies, this);
-            GridLayoutManager layoutManager = new GridLayoutManager(MainActivity.this, 2);
-            this.recycleViewPosterPresentation.setLayoutManager(layoutManager);
-            this.recycleViewPosterPresentation.setAdapter(popularMoviesPosterAdapter);
+            this.popularMoviesPosterAdapter.setListMovie(refListMovies);
+            this.popularMoviesPosterAdapter.notifyDataSetChanged();
             this.recycleViewPosterPresentation.setVisibility(View.VISIBLE);
+            this.recycleViewPosterPresentation.setLayoutManager(this.gridLayoutManagerMovies);
+            this.recycleViewPosterPresentation.setAdapter(this.popularMoviesPosterAdapter);
             this.progressProcess.setVisibility(View.INVISIBLE);
         }
     }
@@ -175,7 +175,7 @@ public class MainActivity extends ActivityFilmesFamosos
         while (iterMovie.hasNext()) {
             Movie refMovieLine = iterMovie.next();
             String strPosterPath = refMovieLine.getPosterPath();
-            RequestCreator requestCreatorRefLine0 = Picasso.with(MainActivity.this).load(strPosterPath);
+            final RequestCreator requestCreatorRefLine0 = Picasso.with(MainActivity.this).load(strPosterPath);
             refMovieLine.setRefRequesImg(requestCreatorRefLine0);
         }
     }
@@ -189,18 +189,65 @@ public class MainActivity extends ActivityFilmesFamosos
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(KEY_TITLE_ACTIVITY , this.strTitle);
+        outState.putInt(KEY_DATA_LOADED, this.typeView);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
+        this.typeView = savedInstanceState.getInt(KEY_DATA_LOADED);
+    }
 
-        boolean existsBundleRestore =
-                savedInstanceState.containsKey(KEY_TITLE_ACTIVITY);
+    private void loadViewPopularMovies () {
+        LoaderCallbacks<PopularMovies> callBack = MainActivity.this;
+        Bundle bundle = new Bundle();
+        bundle.putInt(ID_BUNDLE_URL_PARAM, POPULAR_MOVIES);
+        this.recycleViewPosterPresentation.setVisibility(View.VISIBLE);
+        getSupportLoaderManager().initLoader(MainActivity.LOADER_POPULAR_MOVIES, bundle, callBack);
+        this.strTitle = this.getString(R.string.title_activity_main_default);
+        setTitle(this.strTitle);
+    }
 
-        if (existsBundleRestore) {
-            this.strTitle = savedInstanceState.getString(KEY_TITLE_ACTIVITY);
-            this.setTitle(this.strTitle);
+    private void loadViewTopMovies () {
+        LoaderCallbacks<PopularMovies> callBack = MainActivity.this;
+        Bundle bundle = new Bundle ();
+        bundle.putInt(ID_BUNDLE_URL_PARAM, TOP_RATED_MOVIES);
+        getSupportLoaderManager().initLoader(MainActivity.LOADER_TOP_RATED_MOVIES, bundle, callBack);
+        this.strTitle = this.getString(R.string.title_activity_main_top_rated);
+        this.setTitle(this.strTitle);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initResourceScreen();
+        initResource();
+        loadUrl();
+        boolean isNetworkOk = PopularMoviesCertAcessNetwork.isNetworkAcessOK(this.getApplicationContext());
+
+        //Carga Inicial
+        if (isNetworkOk) {
+            //Verifica se a informação já foi obtida
+            if (!this.dataLoaded) {
+
+                if (this.typeView == TYPE_DEFAULT
+                        || this.typeView == TYPE_POPULAR_MOVIES_VIEW) {
+                    this.loadViewPopularMovies ();
+                    this.typeView = TYPE_POPULAR_MOVIES_VIEW;
+                } else {
+                    this.loadViewTopMovies ();
+                    this.typeView = TYPE_TOP_MOVIES_VIEW;
+                }
+
+                this.dataLoaded = true;
+
+            } else {
+                this.progressProcess.setVisibility(View.INVISIBLE);
+            }
+
+        } else {
+            String msgErro = this.getString(R.string.app_erro_network_acess);
+            new PopularMoviesMsg().showMessageErro(msgErro, MainActivity.this);
         }
     }
 
@@ -209,9 +256,5 @@ public class MainActivity extends ActivityFilmesFamosos
         super.onStart();
     }
 
-    @Override
-    public void onPosScroll() {
-
-    }
 }
 

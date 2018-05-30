@@ -39,7 +39,7 @@ public class VideoMovieReviewNetworkTask
 
     @Override
     public Movie loadInBackground() {
-        String idMovie = this.movieRefer.getId();
+        String idMovie = String.valueOf(this.movieRefer.getId());
         URL urlReview = this.pPopularMoviesNetworkConfig.getURLMovieReview(idMovie);
         URL urlTrailer = this.pPopularMoviesNetworkConfig.getURLMovieTrailer(idMovie);
         String data = this.networkRun.getResponseDataInTheMovieDB(urlReview);
@@ -61,12 +61,18 @@ public class VideoMovieReviewNetworkTask
     @Override
     protected void onStartLoading() {
         this.activityRefer.onInitProgressBar();
-        this.forceLoad();
+
+        if (this.movieResult != null) {
+            deliverResult(this.movieResult);
+        } else {
+            this.forceLoad();
+        }
+
     }
 
     @Override
     public void deliverResult(Movie data) {
-        super.deliverResult(data);
         this.movieResult = data;
+        super.deliverResult(data);
     }
 }

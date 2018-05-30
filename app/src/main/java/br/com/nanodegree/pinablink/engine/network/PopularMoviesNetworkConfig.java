@@ -2,10 +2,8 @@ package br.com.nanodegree.pinablink.engine.network;
 
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
-
 import java.net.MalformedURLException;
 import java.net.URL;
-
 import br.com.nanodegree.pinablink.R;
 
 
@@ -18,10 +16,6 @@ public class PopularMoviesNetworkConfig {
 
     private Uri uriFilterMoviePopular;
     private Uri uriFilterMovieTopRated;
-    private Uri uriFilterMovieReview;
-    private Uri uriFilterMovieTrailer;
-
-
     private AppCompatActivity activityRefer;
 
 
