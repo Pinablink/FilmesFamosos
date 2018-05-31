@@ -2,6 +2,7 @@ package br.com.nanodegree.pinablink;
 
 
 import android.database.Cursor;
+import android.os.Parcelable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
@@ -27,31 +28,47 @@ public class FavoriteActivity extends ActivityFilmesFamosos
     private String strTitle;
     private static final int TASK_QUERY_DB = 3;
     private RecyclerView recycleViewFavPosterPresentation;
+    private GridLayoutManager layoutManager;
     private PopularMoviesPosterFavAdapter popularMoviesPosterFavAdapter;
     private ProgressBar mfavProgressBar;
     private List<Movie> listMovie;
-    private boolean activityRestore;
-    private static final String RESTORE_FAVORITE_ACTIVITY = "Restore";
     private TextView textMsgEmptyFavView;
+    private static final String KEY_LIST_MOVIE_RESTORE = "keyListMovie";
+    private static final String KEY_PARCELABLE_LAYOUT_MANAGER_RESTORE = "keyParcelableLayoutRestore";
+    private Parcelable parcelableState;
+    private boolean isDataLoaded;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorite);
+        ActionBar actionBar = getSupportActionBar();
         this.strTitle = this.getString(R.string.title_activity_main_favorite);
         initResourceScreen();
         this.setTitle(this.strTitle);
+        actionBarEnabledDisplayHome(actionBar);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        LoaderCallbacks<Cursor> callBack = FavoriteActivity.this;
-        if (this.activityRestore) {
-            this.getSupportLoaderManager().restartLoader(FavoriteActivity.TASK_QUERY_DB, null, callBack);
-        } else {
-            this.getSupportLoaderManager().initLoader(FavoriteActivity.TASK_QUERY_DB, null, callBack);
+
+        if (!this.isDataLoaded) {
+            if (this.listMovie == null
+                    || this.listMovie.size() == 0) {
+                LoaderCallbacks<Cursor> callBack = FavoriteActivity.this;
+                this.getSupportLoaderManager().initLoader(FavoriteActivity.TASK_QUERY_DB, null, callBack);
+            } else {
+                this.popularMoviesPosterFavAdapter.setListMovie(this.listMovie);
+                this.layoutManager.onRestoreInstanceState(this.parcelableState);
+                this.textMsgEmptyFavView.setVisibility(View.INVISIBLE);
+                this.recycleViewFavPosterPresentation.setLayoutManager(layoutManager);
+                this.recycleViewFavPosterPresentation.setAdapter(this.popularMoviesPosterFavAdapter);
+                this.recycleViewFavPosterPresentation.setVisibility(View.VISIBLE);
+            }
         }
+
+
     }
 
     private void actionBarEnabledDisplayHome (ActionBar actionBar) {
@@ -63,23 +80,25 @@ public class FavoriteActivity extends ActivityFilmesFamosos
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-
-        boolean boolRestore = savedInstanceState.getBoolean(RESTORE_FAVORITE_ACTIVITY);
-        if (boolRestore) {
-            this.activityRestore = true;
-        }
-
+        this.listMovie = savedInstanceState.getParcelableArrayList(KEY_LIST_MOVIE_RESTORE);
+        this.parcelableState = savedInstanceState.getParcelable(KEY_PARCELABLE_LAYOUT_MANAGER_RESTORE);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBoolean(RESTORE_FAVORITE_ACTIVITY, true);
+        outState.putParcelableArrayList(KEY_LIST_MOVIE_RESTORE,
+                (ArrayList<? extends Parcelable>) this.listMovie);
+
+        Parcelable parcelableState = this.layoutManager.onSaveInstanceState();
+        outState.putParcelable(KEY_PARCELABLE_LAYOUT_MANAGER_RESTORE, parcelableState);
     }
 
     @Override
     protected void initResourceScreen() {
         this.recycleViewFavPosterPresentation = (RecyclerView) findViewById(R.id.recyclerview_fav_presentation_movies);
+        this.layoutManager = new GridLayoutManager(FavoriteActivity.this, 2);
+        this.popularMoviesPosterFavAdapter = new PopularMoviesPosterFavAdapter(FavoriteActivity.this);
         this.mfavProgressBar = (ProgressBar) findViewById(R.id.mFavProgress);
         this.textMsgEmptyFavView = (TextView) findViewById(R.id.txt_msg_fav_empty);
     }
@@ -103,11 +122,10 @@ public class FavoriteActivity extends ActivityFilmesFamosos
             this.mfavProgressBar.setVisibility(View.INVISIBLE);
             this.textMsgEmptyFavView.setVisibility(View.VISIBLE);
         } else {
-            this.popularMoviesPosterFavAdapter = new PopularMoviesPosterFavAdapter(FavoriteActivity.this);
+            this.isDataLoaded = true;
             this.popularMoviesPosterFavAdapter.setListMovie(listMovie);
             this.mfavProgressBar.setVisibility(View.INVISIBLE);
             this.textMsgEmptyFavView.setVisibility(View.INVISIBLE);
-            GridLayoutManager layoutManager = new GridLayoutManager(FavoriteActivity.this, 2);
             this.recycleViewFavPosterPresentation.setLayoutManager(layoutManager);
             this.recycleViewFavPosterPresentation.setAdapter(this.popularMoviesPosterFavAdapter);
             this.recycleViewFavPosterPresentation.setVisibility(View.VISIBLE);

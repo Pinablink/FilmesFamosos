@@ -2,6 +2,7 @@ package br.com.nanodegree.pinablink;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
@@ -13,6 +14,7 @@ import android.widget.ProgressBar;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import br.com.nanodegree.pinablink.dataObject.Movie;
@@ -37,12 +39,16 @@ public class MainActivity extends ActivityFilmesFamosos
     private String strTitle;
     private boolean dataLoaded;
     private static final String KEY_DATA_LOADED = "keyDataLoaded";
+    private static final String LIST_MOVIE = "ListMovie";
+    private static final String PARCELABLE_STATE = "ParcelableState";
     private GridLayoutManager gridLayoutManagerMovies;
     private PopularMoviesPosterAdapter popularMoviesPosterAdapter;
     private static final int TYPE_DEFAULT = -1;
     private static final int TYPE_POPULAR_MOVIES_VIEW = 0;
     private static final int TYPE_TOP_MOVIES_VIEW = 1;
     private int typeView = TYPE_DEFAULT;
+    private List<Movie> refListMovie;
+    private Parcelable parcelableState;
 
     protected void loadUrl () {
         this.urlPopularMovies = this.networkConfig.getURLPopularMovies();
@@ -152,8 +158,8 @@ public class MainActivity extends ActivityFilmesFamosos
             new PopularMoviesMsg().showMessageErro(msgErroJsonParser, MainActivity.this);
         } else {
             PopularMovies popMovies = (PopularMovies)data;
-            List<Movie> refListMovies = popMovies.getListMovie();
-            this.popularMoviesPosterAdapter.setListMovie(refListMovies);
+            this.refListMovie = popMovies.getListMovie();
+            this.popularMoviesPosterAdapter.setListMovie(this.refListMovie);
             this.popularMoviesPosterAdapter.notifyDataSetChanged();
             this.recycleViewPosterPresentation.setVisibility(View.VISIBLE);
             this.recycleViewPosterPresentation.setLayoutManager(this.gridLayoutManagerMovies);
@@ -190,31 +196,72 @@ public class MainActivity extends ActivityFilmesFamosos
         super.onSaveInstanceState(outState);
         outState.putString(KEY_TITLE_ACTIVITY , this.strTitle);
         outState.putInt(KEY_DATA_LOADED, this.typeView);
+        outState.putParcelableArrayList(LIST_MOVIE, (ArrayList<? extends Parcelable>) this.refListMovie);
+
+        Parcelable parcelableRef =  this.gridLayoutManagerMovies.onSaveInstanceState();
+
+        outState.putParcelable(PARCELABLE_STATE, parcelableRef);
     }
+
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         this.typeView = savedInstanceState.getInt(KEY_DATA_LOADED);
+        this.refListMovie = savedInstanceState.getParcelableArrayList(LIST_MOVIE);
+        this.popularMoviesPosterAdapter.setListMovie(this.refListMovie);
+
+        this.parcelableState = savedInstanceState.getParcelable(PARCELABLE_STATE );
+
     }
 
     private void loadViewPopularMovies () {
-        LoaderCallbacks<PopularMovies> callBack = MainActivity.this;
-        Bundle bundle = new Bundle();
-        bundle.putInt(ID_BUNDLE_URL_PARAM, POPULAR_MOVIES);
-        this.recycleViewPosterPresentation.setVisibility(View.VISIBLE);
-        getSupportLoaderManager().initLoader(MainActivity.LOADER_POPULAR_MOVIES, bundle, callBack);
+
         this.strTitle = this.getString(R.string.title_activity_main_default);
         setTitle(this.strTitle);
+
+        if (this.refListMovie == null
+                || this.refListMovie.size() == 0) {
+            LoaderCallbacks<PopularMovies> callBack = MainActivity.this;
+            Bundle bundle = new Bundle();
+            bundle.putInt(ID_BUNDLE_URL_PARAM, POPULAR_MOVIES);
+            this.recycleViewPosterPresentation.setVisibility(View.VISIBLE);
+            getSupportLoaderManager().initLoader(MainActivity.LOADER_POPULAR_MOVIES, bundle, callBack);
+        } else {
+
+            if (this.parcelableState != null) {
+                this.gridLayoutManagerMovies.onRestoreInstanceState(this.parcelableState);
+            }
+
+            this.recycleViewPosterPresentation.setVisibility(View.VISIBLE);
+            this.recycleViewPosterPresentation.setLayoutManager(this.gridLayoutManagerMovies);
+            this.recycleViewPosterPresentation.setAdapter(this.popularMoviesPosterAdapter);
+
+        }
+
     }
 
     private void loadViewTopMovies () {
-        LoaderCallbacks<PopularMovies> callBack = MainActivity.this;
-        Bundle bundle = new Bundle ();
-        bundle.putInt(ID_BUNDLE_URL_PARAM, TOP_RATED_MOVIES);
-        getSupportLoaderManager().initLoader(MainActivity.LOADER_TOP_RATED_MOVIES, bundle, callBack);
+
         this.strTitle = this.getString(R.string.title_activity_main_top_rated);
         this.setTitle(this.strTitle);
+
+        if (this.refListMovie == null
+                || this.refListMovie.size() == 0) {
+            LoaderCallbacks<PopularMovies> callBack = MainActivity.this;
+            Bundle bundle = new Bundle();
+            bundle.putInt(ID_BUNDLE_URL_PARAM, TOP_RATED_MOVIES);
+            getSupportLoaderManager().initLoader(MainActivity.LOADER_TOP_RATED_MOVIES, bundle, callBack);
+        } else {
+
+            if (this.parcelableState != null) {
+                this.gridLayoutManagerMovies.onRestoreInstanceState(this.parcelableState);
+            }
+
+            this.recycleViewPosterPresentation.setVisibility(View.VISIBLE);
+            this.recycleViewPosterPresentation.setLayoutManager(this.gridLayoutManagerMovies);
+            this.recycleViewPosterPresentation.setAdapter(this.popularMoviesPosterAdapter);
+        }
     }
 
     @Override
