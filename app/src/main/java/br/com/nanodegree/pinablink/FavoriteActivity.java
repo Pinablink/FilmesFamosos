@@ -54,9 +54,9 @@ public class FavoriteActivity extends ActivityFilmesFamosos
         super.onResume();
 
         if (!this.isDataLoaded) {
+            LoaderCallbacks<Cursor> callBack = FavoriteActivity.this;
             if (this.listMovie == null
                     || this.listMovie.size() == 0) {
-                LoaderCallbacks<Cursor> callBack = FavoriteActivity.this;
                 this.getSupportLoaderManager().initLoader(FavoriteActivity.TASK_QUERY_DB, null, callBack);
             } else {
                 this.popularMoviesPosterFavAdapter.setListMovie(this.listMovie);
@@ -89,9 +89,8 @@ public class FavoriteActivity extends ActivityFilmesFamosos
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList(KEY_LIST_MOVIE_RESTORE,
                 (ArrayList<? extends Parcelable>) this.listMovie);
-
-        Parcelable parcelableState = this.layoutManager.onSaveInstanceState();
-        outState.putParcelable(KEY_PARCELABLE_LAYOUT_MANAGER_RESTORE, parcelableState);
+        this.parcelableState = this.layoutManager.onSaveInstanceState();
+        outState.putParcelable(KEY_PARCELABLE_LAYOUT_MANAGER_RESTORE, this.parcelableState);
     }
 
     @Override
@@ -145,37 +144,13 @@ public class FavoriteActivity extends ActivityFilmesFamosos
                     dataCursor.getColumnIndex(PopularMoviesContract.PopularMoviesEntry.COLUMN_DATA_ID);
             final int column_index_posterImg64 =
                     dataCursor.getColumnIndex(PopularMoviesContract.PopularMoviesEntry.COLUMN_POSTER_IMAGE);
-            final int column_index_backDropImg64 =
-                    dataCursor.getColumnIndex(PopularMoviesContract.PopularMoviesEntry.COLUMN_BACK_DROP_IMAGE);
-            final int column_index_overview =
-                    dataCursor.getColumnIndex(PopularMoviesContract.PopularMoviesEntry.COLUMN_OVERVIEW);
-            final int column_index_releaseDate =
-                    dataCursor.getColumnIndex(PopularMoviesContract.PopularMoviesEntry.COLUMN_RELEASE_DATE);
-            final int column_index_title =
-                    dataCursor.getColumnIndex(PopularMoviesContract.PopularMoviesEntry.COLUMN_TITLE);
-            final int column_index_voteAverage =
-                    dataCursor.getColumnIndex(PopularMoviesContract.PopularMoviesEntry.COLUMN_VOTE_AVERAGE);
-            final int column_index_voteCount =
-                    dataCursor.getColumnIndex(PopularMoviesContract.PopularMoviesEntry.COLUMN_VOTE_COUNT);
 
             final long idDB = dataCursor.getLong(column_index_id);
             final String strPosterImg64 = dataCursor.getString(column_index_posterImg64);
-            final String strBackDropImg64 = dataCursor.getString(column_index_backDropImg64);
-            final String strOverview = dataCursor.getString(column_index_overview);
-            final String strReleaseData = dataCursor.getString(column_index_releaseDate);
-            final String strTitle = dataCursor.getString(column_index_title);
-            final String strVoteAverage = dataCursor.getString(column_index_voteAverage);
-            final String strVoteCount = dataCursor.getString(column_index_voteCount);
 
             Movie movie = new Movie ();
             movie.setId(idDB);
-            movie.setTitle(strTitle);
             movie.setPosterImageBase64(strPosterImg64);
-            movie.setBackDropImageBase64(strBackDropImg64);
-            movie.setOverview(strOverview);
-            movie.setReleaseDate(strReleaseData);
-            movie.setVoteAverage(strVoteAverage);
-            movie.setVoteCount(strVoteCount);
 
             listMovie.add(movie);
         }

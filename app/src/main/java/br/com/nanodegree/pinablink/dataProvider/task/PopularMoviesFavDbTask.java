@@ -42,7 +42,11 @@ public class PopularMoviesFavDbTask extends AsyncTaskLoader<Cursor> {
             ContentResolver contentResolver = mContext.getContentResolver();
             Uri uri = PopularMoviesContract.PopularMoviesEntry.CONTENT_URI;
             String str = uri.toString();
-            cursorReturn = contentResolver.query(uri, null, null, null, null);
+
+            cursorReturn = contentResolver.query(uri,
+                    new String[] {PopularMoviesContract.PopularMoviesEntry.COLUMN_DATA_ID,
+                            PopularMoviesContract.PopularMoviesEntry.COLUMN_POSTER_IMAGE},
+                    null,null, null);
         } catch (Exception ex) {
             cursorReturn = null;
         }

@@ -25,7 +25,8 @@ public final class Movie implements Parcelable {
     private boolean adult;
     private String overview;
     private String releaseDate;
-    private RequestCreator refRequesImg;
+    private RequestCreator refRequesBackDropImg;
+    private RequestCreator refRequestPosterImg;
     private DetailVideoReviewMovie detailVideoReviewMovie;
     private String posterImageBase64;
     private String backDropImageBase64;
@@ -63,8 +64,6 @@ public final class Movie implements Parcelable {
         adult = in.readByte() != 0;
         overview = in.readString();
         releaseDate = in.readString();
-        posterImageBase64 = in.readString();
-        backDropImageBase64 =  in.readString();
     }
 
     public String getVoteCount() {
@@ -184,14 +183,6 @@ public final class Movie implements Parcelable {
         return video;
     }
 
-    public RequestCreator getRefRequesImg() {
-        return refRequesImg;
-    }
-
-    public void setRefRequesImg(RequestCreator refRequesImg) {
-        this.refRequesImg = refRequesImg;
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -220,8 +211,6 @@ public final class Movie implements Parcelable {
         dest.writeByte((byte) (adult ? 1 : 0));
         dest.writeString(overview);
         dest.writeString(releaseDate);
-        dest.writeString(posterImageBase64);
-        dest.writeString(backDropImageBase64);
     }
 
     public String getPosterImageBase64() {
@@ -240,4 +229,19 @@ public final class Movie implements Parcelable {
         this.backDropImageBase64 = backDropImageBase64;
     }
 
+    public RequestCreator getRefRequesBackDropImg() {
+        return refRequesBackDropImg;
+    }
+
+    public void setRefRequesBackDropImg(RequestCreator refRequesBackDropImg) {
+        this.refRequesBackDropImg = refRequesBackDropImg;
+    }
+
+    public RequestCreator getRefRequestPosterImg() {
+        return refRequestPosterImg;
+    }
+
+    public void setRefRequestPosterImg(RequestCreator refRequestPosterImg) {
+        this.refRequestPosterImg = refRequestPosterImg;
+    }
 }

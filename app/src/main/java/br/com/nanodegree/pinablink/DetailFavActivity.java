@@ -3,8 +3,11 @@ package br.com.nanodegree.pinablink;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -15,13 +18,15 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import br.com.nanodegree.pinablink.dataObject.Movie;
+import br.com.nanodegree.pinablink.dataProvider.PopularMoviesContract;
+import br.com.nanodegree.pinablink.dataProvider.task.PopularMoviesDetailDbTask;
 import br.com.nanodegree.pinablink.engine.persistence.PopularMoviesAddRemoveFav;
 import br.com.nanodegree.pinablink.engine.persistence.PopularMoviesStateFav;
 import br.com.nanodegree.pinablink.engine.util.PopularMoviesBase64ImageExtractor;
 import br.com.nanodegree.pinablink.engine.util.PopularMoviesMsg;
 
 public class DetailFavActivity
-        extends AppCompatActivity {
+        extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private TextView txtvTitle;
     private TextView txtvSinopse;
@@ -29,9 +34,12 @@ public class DetailFavActivity
     private TextView txtvReleaseDate;
     private ImageView imgBackDrop;
     private Movie refMovie;
+    private String idRefMovie;
     private ScrollView scrollViewRefer;
     private ProgressBar progressBarRefer;
     private final String STATE_REF_MOVIE = "MOVIE_CURRENT";
+    private static final int COD_DETAIL_FAV_TASK = 4;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,42 +66,36 @@ public class DetailFavActivity
     protected void onResume() {
         super.onResume();
 
-        if (this.refMovie == null) {
+        this.refMovie = new Movie();
+
+        if (this.idRefMovie == null) {
             Intent mIntent = this.getIntent();
             String keyPutExtra = this.getApplicationContext().
                     getString(R.string.name_movie_trans_activity);
-            this.refMovie = mIntent.getExtras().getParcelable(keyPutExtra);
+            long idMovie = mIntent.getExtras().getLong(keyPutExtra);
+            this.refMovie.setId(idMovie);
+            this.idRefMovie = String.valueOf(idMovie);
+
+            getSupportLoaderManager().initLoader(DetailFavActivity.COD_DETAIL_FAV_TASK, null,
+                    DetailFavActivity.this);
+        } else {
+            this.refMovie.setId(Long.parseLong(this.idRefMovie));
+            getSupportLoaderManager().restartLoader(DetailFavActivity.COD_DETAIL_FAV_TASK, null,
+                    DetailFavActivity.this);
         }
-
-        final String strTitle = this.refMovie.getTitle();
-        final String strSinopse = this.refMovie.getOverview();
-        final String strVoteAverage = this.refMovie.getVoteAverage();
-        final String strReleaseDate = this.refMovie.getReleaseDate();
-        final String strBackDropImage64 = this.refMovie.getBackDropImageBase64();
-
-        Bitmap bitmap = PopularMoviesBase64ImageExtractor.getBitmapStrEncoded(strBackDropImage64);
-
-        this.txtvTitle.setText(strTitle);
-        this.txtvSinopse.setText(strSinopse);
-        this.txtvVoteAverage.setText(strVoteAverage);
-        this.txtvReleaseDate.setText(strReleaseDate);
-        this.imgBackDrop.setImageBitmap(bitmap);
-
-        this.scrollViewRefer.setVisibility(View.VISIBLE);
-        this.progressBarRefer.setVisibility(View.INVISIBLE);
 
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(STATE_REF_MOVIE, this.refMovie);
+        outState.putString(STATE_REF_MOVIE, this.idRefMovie);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        this.refMovie = savedInstanceState.getParcelable(STATE_REF_MOVIE);
+        this.idRefMovie = savedInstanceState.getString(STATE_REF_MOVIE);
     }
 
     @Override
@@ -121,5 +123,56 @@ public class DetailFavActivity
 
 
         return super.onOptionsItemSelected(item);
+    }
+
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+        PopularMoviesDetailDbTask popularMoviesDetailDbTask =
+                new PopularMoviesDetailDbTask(this.getApplicationContext(), this.refMovie);
+
+        return popularMoviesDetailDbTask;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        while (data.moveToNext()) {
+            final int columnIdIndex =
+                    data.getColumnIndex(PopularMoviesContract.PopularMoviesEntry.COLUMN_DATA_ID);
+            final int columnTitleIndex  =
+                    data.getColumnIndex(PopularMoviesContract.PopularMoviesEntry.COLUMN_TITLE);
+            final int columnOverviewIndex =
+                    data.getColumnIndex(PopularMoviesContract.PopularMoviesEntry.COLUMN_OVERVIEW);
+            final int columnVoteAverageIndex =
+                    data.getColumnIndex(PopularMoviesContract.PopularMoviesEntry.COLUMN_VOTE_AVERAGE);
+            final int columnBackDropImageIndex =
+                    data.getColumnIndex(PopularMoviesContract.PopularMoviesEntry.COLUMN_BACK_DROP_IMAGE);
+            final int columnReleaseDateIndex =
+                    data.getColumnIndex(PopularMoviesContract.PopularMoviesEntry.COLUMN_RELEASE_DATE);
+
+            final String movieTitle = data.getString(columnTitleIndex);
+            final String movieOverview = data.getString(columnOverviewIndex);
+            final String movieVoteAverage = data.getString(columnVoteAverageIndex);
+            final String movieReleaseDate = data.getString(columnReleaseDateIndex);
+            final String movieBackDropImg64 = data.getString(columnBackDropImageIndex);
+
+            Bitmap bitmap = PopularMoviesBase64ImageExtractor.getBitmapStrEncoded(movieBackDropImg64);
+
+            this.txtvTitle.setText(movieTitle );
+            this.txtvSinopse.setText(movieOverview);
+            this.txtvVoteAverage.setText(movieVoteAverage);
+            this.txtvReleaseDate.setText(movieReleaseDate);
+            this.imgBackDrop.setImageBitmap(bitmap);
+
+            this.scrollViewRefer.setVisibility(View.VISIBLE);
+            this.progressBarRefer.setVisibility(View.INVISIBLE);
+
+        }
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
     }
 }

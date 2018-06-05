@@ -26,13 +26,11 @@ import br.com.nanodegree.pinablink.dataObject.MovieTrailer;
 import br.com.nanodegree.pinablink.dataObject.Review;
 import br.com.nanodegree.pinablink.engine.adapter.PopularMoviesReviewAdapter;
 import br.com.nanodegree.pinablink.engine.adapter.PopularMoviesTrailerAdapter;
-import br.com.nanodegree.pinablink.engine.listener.popularMoviesInterface.PopularMoviesConvertImageBase64On;
 import br.com.nanodegree.pinablink.engine.network.task.ActivityFilmesFamosos;
 import br.com.nanodegree.pinablink.engine.network.task.AsyncTaskNetworkDelegator;
 import br.com.nanodegree.pinablink.engine.network.task.VideoMovieReviewNetworkTask;
 import br.com.nanodegree.pinablink.engine.persistence.PopularMoviesAddRemoveFav;
 import br.com.nanodegree.pinablink.engine.persistence.PopularMoviesStateFav;
-import br.com.nanodegree.pinablink.engine.util.PopularMoviesBase64ImageExtractor;
 import br.com.nanodegree.pinablink.engine.util.PopularMoviesCertAcessNetwork;
 import br.com.nanodegree.pinablink.engine.util.PopularMoviesFormat;
 import br.com.nanodegree.pinablink.engine.util.PopularMoviesMsg;
@@ -42,8 +40,7 @@ import br.com.nanodegree.pinablink.engine.util.PopularMoviesMsg;
  */
 public class DetailActivity
         extends ActivityFilmesFamosos
-        implements AsyncTaskNetworkDelegator, LoaderCallbacks<Movie>,
-        PopularMoviesConvertImageBase64On {
+        implements AsyncTaskNetworkDelegator, LoaderCallbacks<Movie>{
 
     private TextView textTitle;
     private TextView textSinopse;
@@ -273,16 +270,11 @@ public class DetailActivity
     public void onSearchImages(Object pDetailMovies) {
         Movie movie = (Movie) pDetailMovies;
         String strBackDropImage = movie.getBackdropPath();
-
-        RequestCreator refRequestImg = Picasso.with(this.getApplicationContext()).load(strBackDropImage);
-        movie.setRefRequesImg(refRequestImg);
-
-        PopularMoviesBase64ImageExtractor popularMoviesBitmapExtractor =
-                new PopularMoviesBase64ImageExtractor(movie, this);
-
-        //Transformar a Imagem obtida em Base64 para persistencia em base
-        new Thread(popularMoviesBitmapExtractor).start();
-        //
+        String strPosterImage = movie.getPosterPath();
+        RequestCreator refRequestBackDropImg = Picasso.with(this.getApplicationContext()).load(strBackDropImage);
+        RequestCreator refRequestPosteriImg = Picasso.with(this.getApplicationContext()).load(strPosterImage);
+        movie.setRefRequesBackDropImg(refRequestBackDropImg);
+        movie.setRefRequestPosterImg(refRequestPosteriImg);
 
         DetailVideoReviewMovie detailMovie = movie.getDetailVideoReviewMovie();
         List<MovieTrailer> listMovieTrailer =  detailMovie.getListMovieTrailer();
@@ -319,7 +311,7 @@ public class DetailActivity
         final int POS_INI_X_SCROLL = 0;
         final int POS_INI_Y_SCROLL = 0;
         Movie detailMovie = data;
-        RequestCreator requestCreatorObject = detailMovie.getRefRequesImg();
+        RequestCreator requestCreatorObject = detailMovie.getRefRequesBackDropImg();
 
         this.progressBar.setVisibility(View.INVISIBLE);
         this.scrollView.setVisibility(View.VISIBLE);
@@ -358,8 +350,4 @@ public class DetailActivity
         this.refMovie = savedInstanceState.getParcelable(STATE_REF_MOVIE);
     }
 
-    @Override
-    public void onConvertImageBase64(Movie movie, String strImageBase64) {
-        movie.setBackDropImageBase64(strImageBase64);
-    }
 }

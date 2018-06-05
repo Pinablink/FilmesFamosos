@@ -59,7 +59,9 @@ public class PopularMoviesContentProvider extends ContentProvider{
             default: throw new UnsupportedOperationException("NOT URI: " + uri);
         }
 
-        retCursor.setNotificationUri(getContext().getContentResolver(), uri);
+        if (retCursor.getCount() > 0) {
+            retCursor.setNotificationUri(getContext().getContentResolver(), uri);
+        }
 
         return retCursor;
     }

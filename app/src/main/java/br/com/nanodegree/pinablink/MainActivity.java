@@ -182,7 +182,7 @@ public class MainActivity extends ActivityFilmesFamosos
             Movie refMovieLine = iterMovie.next();
             String strPosterPath = refMovieLine.getPosterPath();
             final RequestCreator requestCreatorRefLine0 = Picasso.with(MainActivity.this).load(strPosterPath);
-            refMovieLine.setRefRequesImg(requestCreatorRefLine0);
+            refMovieLine.setRefRequestPosterImg(requestCreatorRefLine0);
         }
     }
 

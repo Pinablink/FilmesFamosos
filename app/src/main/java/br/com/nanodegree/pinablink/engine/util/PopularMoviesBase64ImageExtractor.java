@@ -7,7 +7,7 @@ import com.squareup.picasso.RequestCreator;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import br.com.nanodegree.pinablink.dataObject.Movie;
-import br.com.nanodegree.pinablink.engine.listener.popularMoviesInterface.PopularMoviesConvertImageBase64On;
+import br.com.nanodegree.pinablink.engine.listener.PopularMoviesImgParser64On;
 
 
 /**
@@ -16,12 +16,12 @@ import br.com.nanodegree.pinablink.engine.listener.popularMoviesInterface.Popula
 public class PopularMoviesBase64ImageExtractor implements Runnable {
 
     private Movie refMovie;
-    private PopularMoviesConvertImageBase64On refPopularMoviesConvertImageBase64On;
+    private PopularMoviesImgParser64On popularParserOnRef;
 
     public PopularMoviesBase64ImageExtractor(Movie movie,
-                                             PopularMoviesConvertImageBase64On pPopularMoviesConvertImageBase64On ) {
+                                             PopularMoviesImgParser64On pPopularParserOnRef) {
         this.refMovie = movie;
-        this.refPopularMoviesConvertImageBase64On = pPopularMoviesConvertImageBase64On;
+        this.popularParserOnRef = pPopularParserOnRef;
     }
 
 
@@ -35,22 +35,35 @@ public class PopularMoviesBase64ImageExtractor implements Runnable {
     @Override
     public void run() {
 
-        Bitmap bitmap;
-        String imageBase64;
+        Bitmap bitmapBackDrop;
+        Bitmap bitmapPoster;
+        String imageBackDropBase64 = null;
+        String imagePosterBase64 = null;
 
         try {
 
-            RequestCreator requestCreator = this.refMovie.getRefRequesImg();
-            bitmap = requestCreator.get();
+            RequestCreator requestBackDropCreator = this.refMovie.getRefRequesBackDropImg();
+            bitmapBackDrop = requestBackDropCreator.get();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+            bitmapBackDrop.compress(Bitmap.CompressFormat.PNG, 100, baos);
+
             byte[] byteArrayBitmap = baos.toByteArray();
-            imageBase64 = Base64.encodeToString(byteArrayBitmap, Base64.DEFAULT);
+            imageBackDropBase64 = Base64.encodeToString(byteArrayBitmap, Base64.DEFAULT);
+
+            RequestCreator requestPosterCreator = this.refMovie.getRefRequestPosterImg();
+            bitmapPoster = requestPosterCreator.get();
+
+            baos = new ByteArrayOutputStream();
+            bitmapPoster.compress(Bitmap.CompressFormat.PNG, 100, baos);
+            byteArrayBitmap = baos.toByteArray();
+            imagePosterBase64 = Base64.encodeToString(byteArrayBitmap, Base64.DEFAULT);
 
         } catch (IOException e) {
-            imageBase64 = "";
+            imageBackDropBase64 = "";
+            imagePosterBase64 = "";
+        } finally {
+           this.popularParserOnRef.onParser(imageBackDropBase64, imagePosterBase64);
         }
 
-        this.refPopularMoviesConvertImageBase64On.onConvertImageBase64(this.refMovie, imageBase64);
     }
 }

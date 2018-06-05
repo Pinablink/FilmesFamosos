@@ -7,7 +7,7 @@
     <string name="cfg_app_path_url_video1">http://api.themoviedb.org/3/movie/</string>
     <string name="cfg_app_path_url_video2">/videos</string>
     <string name="cfg_app_api_key">api_key</string>
-    <string name="cfg_app_api_key_value">INSIRA AQUI A CHAVE DE API</string>
+    <string name="cfg_app_api_key_value">INDIQUE AQUI SUA CHAVE DE API</string>
     <string name="cfg_app_call_youtube_app">vnd.youtube://</string>
     <string name="cfg_app_call_youtube_webbrowser">http://www.youtube.com/watch</string>
     <string name="cfg_app_param_name_key">v</string>
@@ -19,7 +19,7 @@
     <string name="menu_label_favorites">Meus Favoritos</string>
     <!-- Fim da área de configuração de Strings de comandos -->
     <!-- String titulo de recursos para transporte de intents -->
-    <string name="name_movie_trans_activity">movieObject</string>
+    <string name="name_movie_trans_activity">movieId</string>
     <!-- Fim da área de configuração -->
     <string name="title_msg_erro">Erro</string>
     <string name="title_activity_main_default">Filmes Mais Populares</string>
